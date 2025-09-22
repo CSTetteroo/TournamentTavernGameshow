@@ -66,8 +66,18 @@
                 <span>Hide answers</span>
             </label>
             <span class="muted">Total: {{ isset($questions) ? $questions->count() : 0 }}</span>
+            <form method="POST" action="{{ route('questions.reset') }}" onsubmit="return confirm('Reset all questions to unused?');">
+                @csrf
+                <button type="submit" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#001018; font-weight:800; cursor:pointer;">Reset Used</button>
+            </form>
         </div>
     </header>
+
+    @if (session('status'))
+        <div style="margin-bottom: 12px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background: rgba(87,241,255,.08); color: var(--text);">
+            {{ session('status') }}
+        </div>
+    @endif
 
     <div class="panel">
         <table id="qTable">
@@ -76,6 +86,7 @@
                     <th style="width:90px;">ID</th>
                     <th>Question</th>
                     <th style="width:50%;">Answer</th>
+                    <th style="width:40px;">Used</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,6 +97,7 @@
                         <div class="q">{{ $q->question }}</div>
                     </td>
                     <td data-col="answer">{{ $q->answer }}</td>
+                    <td>{{ $q->used ? '✅' : '' }}</td>
                 </tr>
             @empty
                 <tr><td class="empty" colspan="3">No questions yet.</td></tr>

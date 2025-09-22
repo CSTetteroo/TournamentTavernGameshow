@@ -14,11 +14,14 @@ use App\Http\Controllers\QuestionController;
 |
 */
 
-Route::get('/', [QuestionController::class, 'welcome'])->name('welcome');
+Route::get('/', [QuestionController::class, 'welcome'])->name('round1');
 
 // All questions table (styled bank)
 Route::get('/questions', [QuestionController::class, 'index'])->name('questions.all');
 
 // Backward-compatible alias
 Route::get('/question', [QuestionController::class, 'index']);
+
+// Reset all questions to unused
+Route::post('/questions/reset-used', [QuestionController::class, 'resetUsed'])->name('questions.reset');
 

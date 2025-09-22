@@ -262,7 +262,7 @@
             <footer>
                 <div class="tip">Tip: Use brain</div>
                 <div class="controls">
-                    <a class="btn" id="nextBtn" href="{{ route('welcome') }}" aria-label="Next question">Next</a>
+                    <a class="btn" id="nextBtn" href="{{ route('round1') }}" aria-label="Next question">Next</a>
                 </div>
             </footer>
         </section>

@@ -17,7 +17,19 @@ class QuestionController extends Controller
     public function welcome()
     {
         // Fetch a single random question for the welcome (game show) view
-        $question = Question::inRandomOrder()->first();
-        return view('welcome', compact('question'));
+        $question = Question::where('used', 0)->inRandomOrder()->first();
+        // Mark the fetched question as used
+        if ($question) {
+            $question->used = 1;
+            $question->save();
+        }
+        return view('round1', compact('question'));
+    }
+
+    public function resetUsed(Request $request)
+    {
+        // Set all questions to unused
+        Question::query()->update(['used' => 0]);
+        return redirect()->route('questions.all')->with('status', 'All questions have been reset to unused.');
     }
 }
