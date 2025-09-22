@@ -84,11 +84,11 @@
             letter-spacing: 1px;
         }
         .logo {
-            width: 100px; height: 100px; border-radius: 28px;
+            min-width: 100px; height: 100px; border-radius: 28px;
             background: radial-gradient(circle at 30% 30%, var(--gold), #e24bff 60%, #5ee7ff 100%);
             box-shadow: 0 0 25px rgba(0, 153, 255, 0.45), 0 0 18px rgba(0, 230, 255, .35) inset;
             background-image: url('{{ asset('img/tt.png') }}');
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
@@ -129,7 +129,7 @@
         .question {
             margin: 6px 0 0;
             font-weight: 900;
-            font-size: clamp(28px, 4.8vw, 72px);
+            font-size: clamp(16px, 4.8vw, 46px);
             line-height: 1.05;
             text-shadow: 0 6px 22px rgba(0,0,0,.45), 0 0 22px rgba(0, 230, 255, .25);
         }
@@ -190,6 +190,14 @@
         .answer-card.revealed .reveal-cover { display: none; }
         .answer-card.revealed { box-shadow: 0 16px 38px rgba(0,0,0,0.55), 0 0 0 3px rgba(0, 230, 255, .25) inset; }
 
+        /* Layout with right sidebar */
+        .content { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+        @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
+        .sidebar { position: relative; z-index: 1; padding: 16px; border-radius: 16px; background: var(--glass); border: 1px solid rgba(255,255,255,0.14); }
+        .tier { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); }
+        .tier.active { background: linear-gradient(90deg, rgba(94,177,255,.25), rgba(94,231,255,.25)); box-shadow: inset 0 0 0 1px rgba(94,231,255,.45); }
+        .prize { font-weight: 800; color: #ffd166; }
+
         footer { position: relative; z-index: 1; margin-top: clamp(16px, 2vw, 28px); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
         .tip { color: #b3c5ff; opacity: .9; font-size: 14px; }
         .controls { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -199,6 +207,14 @@
             color: #061122; background: linear-gradient(90deg, #5eb1ff, #5ee7ff); box-shadow: 0 8px 22px rgba(87, 241, 255, .35);
         }
         .btn.secondary { color: #dfe9ff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); box-shadow: none; }
+        .btn.danger { background: linear-gradient(90deg, #ff7b7b, #ff5252); border-color: #5e2940; color: #260a0a; }
+        .btn.neutral { background: rgba(255,255,255,.1); color:#eaf4ff; border-color:#3a4a66; }
+
+    /* Timer */
+    .timer { display:flex; flex-direction: column; gap:8px; align-items:flex-start; }
+    .timer-row { display:flex; align-items:center; gap:10px; flex-wrap: wrap; }
+        .timer input { width: 110px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: var(--text); }
+        .time-display { font-family:'Orbitron', system-ui, sans-serif; font-weight:900; letter-spacing:.08em; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); }
 
         /* Confetti canvas */
         canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
@@ -224,63 +240,115 @@
                         <div class="badge" aria-label="Game Show Mode">Official Deepwoken Gameshow</div>
                     </div>
                 </div>
-                <div class="badge" title="Round">Round <span id="round">1</span></div>
-            </header>
-
-            <div class="question-wrap" id="questionWrap" role="button" tabindex="0" aria-expanded="false" aria-label="Reveal question">
-                <div class="question-cover">
-                    <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    <div class="reveal-title">Reveal Question</div>
-                </div>
-                <h1 id="question" class="question">
-                    <div class="question-label">Question</div>
-                    {{ isset($question) && $question ? $question->question : ($question ?? 'Which creature can hold its breath the longest?') }}
-                </h1>
-            </div>
-
-            <div class="answer-wrap">
-                <div
-                    id="answerCard"
-                    class="answer-card"
-                    role="button"
-                    tabindex="0"
-                    aria-expanded="false"
-                    aria-controls="answerText"
-                    data-answer="{{ isset($question) && $question ? $question->answer : ($answer ?? 'Cuvier’s beaked whale — over 3 hours!') }}"
-                >
-                    <div class="reveal-cover">
-                        <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                        <div class="reveal-title">Reveal Answer</div>
+                <div class="timer" aria-label="Countdown timer">
+                    <div class="timer-row">
+                        <span class="time-display" id="time">00:00</span>
+                        <input id="timeInput" type="text" placeholder="mm:ss" aria-label="Set timer (mm:ss)" />
+                        <button class="btn neutral" id="setTimerBtn" type="button">Set</button>
                     </div>
-                    <div id="answerText" class="answer" aria-hidden="true"></div>
+                    <div class="timer-row">
+                        <button class="btn secondary" id="pauseBtn" type="button">Pause</button>
+                        <button class="btn" id="startBtn" type="button">Start</button>
+                        <button class="btn danger" id="resetBtn" type="button">Reset</button>
+                    </div>
                 </div>
-            </div>
+            </header>
+            <div class="content">
+                <div>
+                    <div class="question-wrap" id="questionWrap" role="button" tabindex="0" aria-expanded="false" aria-label="Reveal question">
+                        <div class="question-cover">
+                            <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <div class="reveal-title">Reveal Question</div>
+                        </div>
+                        <h1 id="question" class="question">
+                            <div class="question-label">Question</div>
+                            {{ isset($question) && $question ? $question->question : ($question ?? 'Which creature can hold its breath the longest?') }}
+                        </h1>
+                    </div>
 
-            <footer>
-                <div class="tip">Tip: Use brain</div>
-                <div class="controls">
-                    <a class="btn" id="nextBtn" href="{{ route('round1') }}" aria-label="Next question">Next</a>
+                    <div class="answer-wrap">
+                        <div
+                            id="answerCard"
+                            class="answer-card"
+                            role="button"
+                            tabindex="0"
+                            aria-expanded="false"
+                            aria-controls="answerText"
+                            data-answer="{{ isset($question) && $question ? $question->answer : ($answer ?? 'Cuvier’s beaked whale — over 3 hours!') }}"
+                        >
+                            <div class="reveal-cover">
+                                <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <div class="reveal-title">Reveal Answer</div>
+                            </div>
+                            <div id="answerText" class="answer" aria-hidden="true"></div>
+                        </div>
+                    </div>
+
+                    <footer>
+                        <div class="tip">Mark result for this question</div>
+                        <div class="controls">
+                            <form method="POST" action="{{ route('round2.correct') }}">
+                                @csrf
+                                <button class="btn" type="submit">Correct</button>
+                            </form>
+                            <form method="POST" action="{{ route('round2.wrong') }}">
+                                @csrf
+                                <button class="btn danger" type="submit">Wrong</button>
+                            </form>
+                            <form method="POST" action="{{ route('round2.skip') }}">
+                                @csrf
+                                @if(isset($question) && $question)
+                                    <input type="hidden" name="id" value="{{ $question->id }}" />
+                                @endif
+                                <button class="btn secondary" type="submit">Skip</button>
+                            </form>
+                        </div>
+                    </footer>
                 </div>
-            </footer>
+
+                <aside class="sidebar" aria-label="Prize tiers">
+                    <h3 style="margin-top:0;">Prize Ladder</h3>
+                    @php
+                        $prizes = [
+                            '???', '???', '???', '???', '???',
+                            '???', '???', '???', '???', '???'
+                        ];
+                        $active = isset($tiers) ? $tiers : 0;
+                    @endphp
+                    @for($i = 0; $i < 10; $i++)
+                        <div class="tier {{ $i < $active ? 'active' : '' }}">
+                            <div>Q{{ $i+1 }}</div>
+                            <div class="prize">{{ $prizes[$i] }}</div>
+                        </div>
+                    @endfor
+                </aside>
+            </div>
         </section>
     </div>
 
     <script>
         const answerCard = document.getElementById('answerCard');
         const answerText = document.getElementById('answerText');
-        const nextBtn = document.getElementById('nextBtn');
-        const roundEl = document.getElementById('round');
         const questionWrap = document.getElementById('questionWrap');
+        // Timer elements
+        const timeEl = document.getElementById('time');
+        const timeInput = document.getElementById('timeInput');
+        const setTimerBtn = document.getElementById('setTimerBtn');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
 
         let revealed = false; // answer revealed
         let qRevealed = false; // question revealed
-        let round = 1;
+        // Timer state
+        let totalSeconds = 0; // countdown remaining
+        let timerId = null;
 
         function setQuestionVisible(show) {
             qRevealed = !!show;
@@ -319,9 +387,53 @@
             if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); reveal(); }
         });
 
-        // Next button navigates to a fresh random question (handled server-side)
-        // No JS needed since it's a link, but keep for possible future enhancements
-        nextBtn?.addEventListener('click', () => { /* navigation via href */ });
+        // Timer helpers
+        function formatTime(s) {
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const ss = Math.floor(s % 60).toString().padStart(2, '0');
+            return `${m}:${ss}`;
+        }
+        function renderTime() { timeEl.textContent = formatTime(totalSeconds); }
+        function parseInput(val) {
+            if (!val) return null;
+            const parts = val.split(':').map(p => p.trim());
+            if (parts.length !== 2) return null;
+            const m = parseInt(parts[0], 10); const s = parseInt(parts[1], 10);
+            if (Number.isNaN(m) || Number.isNaN(s) || m < 0 || s < 0 || s >= 60) return null;
+            return m * 60 + s;
+        }
+        function tick() {
+            if (totalSeconds > 0) {
+                totalSeconds -= 1;
+                renderTime();
+                if (totalSeconds === 0) {
+                    // Auto-reveal answer on zero
+                    reveal();
+                    stopTimer();
+                }
+            }
+        }
+        function startTimer() {
+            if (timerId || totalSeconds <= 0) return;
+            timerId = setInterval(tick, 1000);
+        }
+        function stopTimer() {
+            if (timerId) { clearInterval(timerId); timerId = null; }
+        }
+        function resetTimer() {
+            stopTimer();
+            totalSeconds = 0;
+            renderTime();
+        }
+        setTimerBtn?.addEventListener('click', () => {
+            const v = parseInput(timeInput.value);
+            if (v == null) { alert('Enter mm:ss (e.g., 01:30)'); return; }
+            totalSeconds = v; renderTime();
+        });
+        startBtn?.addEventListener('click', startTimer);
+        pauseBtn?.addEventListener('click', stopTimer);
+        resetBtn?.addEventListener('click', resetTimer);
+        renderTime();
 
         // Confetti (simple, lightweight)
         const canvas = document.getElementById('confetti');

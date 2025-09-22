@@ -25,3 +25,9 @@ Route::get('/question', [QuestionController::class, 'index']);
 // Reset all questions to unused
 Route::post('/questions/reset-used', [QuestionController::class, 'resetUsed'])->name('questions.reset');
 
+// Round 2 routes
+Route::get('/round2', [QuestionController::class, 'round2'])->name('round2');
+Route::post('/round2/correct', [QuestionController::class, 'round2Correct'])->name('round2.correct');
+Route::post('/round2/wrong', [QuestionController::class, 'round2Wrong'])->name('round2.wrong');
+Route::post('/round2/skip', [QuestionController::class, 'round2Skip'])->name('round2.skip');
+
