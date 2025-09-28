@@ -31,6 +31,7 @@ h1{font-family:Orbitron,sans-serif;letter-spacing:.05em;text-transform:uppercase
 .cell.player{outline:2px solid var(--accent);box-shadow:0 0 0 3px rgba(87,241,255,.25),0 0 22px -4px var(--accent);}
 .cell.chaser{outline:2px solid var(--danger);box-shadow:0 0 0 3px rgba(255,61,85,.35),0 0 22px -4px var(--danger);}
 .cell.caught{background:linear-gradient(120deg,#4d0a1d,#8b1633);color:#fff;}
+.cell.behind-chaser{background:linear-gradient(145deg,#3a1019,#29060d);color:#ffb5c1;}
 .cell .label{position:absolute;bottom:4px;right:8px;font-size:11px;opacity:.55;letter-spacing:.08em;}
 /* movement animation removed for cleaner static board */
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;}
@@ -152,6 +153,8 @@ function buildBoard(board, animate=true){
       if (i===playerPos) cls+=' player';
       if (i===chaserPos) cls+=' chaser';
     }
+    // Any index greater than chaser position is "behind" the chaser
+    if (i > chaserPos) cls+=' behind-chaser';
     const div = document.createElement('div');
     // animation removed
     div.className = cls;

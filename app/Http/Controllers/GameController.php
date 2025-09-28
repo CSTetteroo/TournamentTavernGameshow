@@ -37,7 +37,27 @@ class GameController extends Controller
                     'option_a' => 'A','option_b' => 'B','option_c' => 'C','correct' => 'a',
                 ];
             }
-            return DB::table('multiple_choice_questions')->inRandomOrder()->first();
+            // Fetch a random unused MCQ; mark it used immediately (atomic via transaction)
+            return DB::transaction(function () {
+                $row = DB::table('multiple_choice_questions')
+                    ->where('used', 0)
+                    ->inRandomOrder()
+                    ->lockForUpdate()
+                    ->first();
+                if ($row) {
+                    DB::table('multiple_choice_questions')->where('id', $row->id)->update(['used' => 1]);
+                    $row->used = 1;
+                    return $row;
+                }
+                // None unused: surface a placeholder message
+                $total = DB::table('multiple_choice_questions')->count();
+                return (object) [
+                    'id' => 0,
+                    'question' => $total ? 'All multiple choice questions have been used. Reset them in the MCQ bank.' : 'No multiple choice questions found.',
+                    'option_a' => 'A','option_b' => 'B','option_c' => 'C','correct' => 'a',
+                    'used' => 1,
+                ];
+            });
         } catch (\Throwable $e) {
             return (object) [
                 'id' => 0,

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\MultipleChoiceQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,4 +40,8 @@ Route::post('/head-to-head/answer-json', [GameController::class, 'answerJson'])-
 Route::post('/head-to-head/reset-json', [GameController::class, 'resetJson'])->name('h2h.reset.json');
 Route::post('/head-to-head/next-question', [GameController::class, 'nextQuestion'])->name('h2h.next');
 Route::post('/head-to-head/set-positions', [GameController::class, 'setPositions'])->name('h2h.set.positions');
+
+// Multiple choice question bank (separate from qa_pairs)
+Route::get('/mcq', [MultipleChoiceQuestionController::class, 'index'])->name('mcq.index');
+Route::post('/mcq/reset-used', [MultipleChoiceQuestionController::class, 'resetUsed'])->name('mcq.reset');
 

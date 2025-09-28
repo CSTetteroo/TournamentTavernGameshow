@@ -10,6 +10,6 @@ class MultipleChoiceQuestion extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'question', 'option_a', 'option_b', 'option_c', 'correct',
+        'question', 'option_a', 'option_b', 'option_c', 'correct', 'used'
     ];
 }
