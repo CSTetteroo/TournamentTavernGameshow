@@ -316,8 +316,8 @@
                     <h3 style="margin-top:0;">Prize Ladder</h3>
                     @php
                         $prizes = [
-                            '???', '???', '???', '???', '???',
-                            '???', '???', '???', '???', '???'
+                            '5 Moonseyes', '15 Idols, 5 Moonseyes', 'Whistling Periapt', 'Obt Relic of Choice', 'Obt Item of Choice',
+                            'Name', 'Name + Mantle', 'Name + Title', 'Name + Title + Mantle', 'Name + Title + Obt item'
                         ];
                         $active = isset($tiers) ? $tiers : 0;
                     @endphp
