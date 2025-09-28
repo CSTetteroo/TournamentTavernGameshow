@@ -1,0 +1,147 @@
+-- Multiple Choice Questions seed
+-- Generated: 2025-09-23
+-- Creates a standalone table and inserts curated A/B/C questions from Discord export
+
+-- Table: multiple_choice_questions
+CREATE TABLE IF NOT EXISTS `multiple_choice_questions` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`question` TEXT NOT NULL,
+	`option_a` VARCHAR(255) NOT NULL,
+	`option_b` VARCHAR(255) NOT NULL,
+	`option_c` VARCHAR(255) NOT NULL,
+	`correct` ENUM('a','b','c') NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+BEGIN;
+
+INSERT INTO `multiple_choice_questions` (`question`, `option_a`, `option_b`, `option_c`, `correct`) VALUES
+-- 1
+('Which was the first of these oaths to get reworked', 'Jetstriker', 'Silentheart', 'Visionshaper', 'a'),
+-- 2
+('Which of these islands can you not purchase mantra modifiers from', 'Summer Isle', 'Miners Landing', 'Meteor Isle', 'a'),
+-- 3
+('Which island got the biggest rework when verse 2 dropped', 'Summer Island', 'Songseeker Isle', 'Starswept Valley', 'b'),
+-- 4
+('How many fins does primadon have?', '4', '6', '7', 'b'),
+-- 5
+('What is the thundercall trainer called?', 'Blight', 'Electroz', 'Surge', 'c'),
+-- 6
+('How many medium weapons have a 75 investment? (as of 2025-09-22)', '19', '20', '11', 'c'),
+-- 7
+('What is the name of the location bridging miners landing to the starfield veldt', 'Saramaed Crossing', 'Saramaed Summit', 'Chariot''s Spire', 'a'),
+-- 8
+('Which of the following is NOT a stat that counts towards the Chainwarden stat requirement?', 'Willpower', 'Agility', 'Strength', 'b'),
+-- 9
+('The glowing core of the black diver outfit is typically what colour?', 'White', 'Red', 'Yellow', 'c'),
+-- 10
+('Who gives you the pleeksty inferno', 'Amorus Pleeksty', 'Aska', 'Amashi', 'b'),
+-- 11
+('Which of these weapons has a unique critical', 'Forgotten Gladius', 'Canor Fang', 'Master Hawk''s Handaxe', 'b'),
+-- 12
+('Swift Rebound is a prerequisite to which of the following talents?', 'Evasive Expert', 'In a Hurry', 'Leaf in the Wind', 'a'),
+-- 13
+('How many origins currently exist as of 2025-09-22?', '6', '8', '10', 'b'),
+-- 14
+('The description "After you land a flourish, gain the ability to shoot bullets for 5 seconds." belongs to what talent?', 'Parting Gift', 'Rapid Fire', 'Quick Draw', 'a'),
+-- 15
+('The Nestmind, the Visionshaper oath giver, has how many faces?', '5', '6', '7', 'c'),
+-- 16
+('What shrine rerolls your mantras?', 'Shrine of Mastery', 'Shrine of Conceit', 'Shrine of Temptation', 'c'),
+-- 17
+('"An esoteric place even the most pious of men are known to seek out, though all take the secret to their graves." is the description of which area?', 'Temple of Hearts', 'Temple of the Forgotten Flame', 'Lightkeepers'' Temple', 'a'),
+-- 18
+('When was the deepwoken discord established?', 'December 2021', 'October 2019', 'March 2020', 'a'),
+-- 19
+('Which of these effects does the mantle of enmity not possess', 'Proccing critical talents on hit', 'Applying Wither on hit', 'Dealing true damage on hit', 'c'),
+-- 20
+('Which number prophet is the Lord Regent?', '3rd', '4th', '5th', 'b'),
+-- 21
+('What oath requires level 15?', 'Starkindred', 'Fadetrimmer', 'Dawnwalker', 'c'),
+-- 22
+('Which weapon summons 3 pillars upon critical', 'Relic Axe', 'Master Hawk''s Handaxe', 'Adretian Axe', 'a'),
+-- 23
+('Which of these oaths cannot be re-obtained after oathbreaking?', 'Bladeharper', 'Arcwarder', 'Blindseer', 'b'),
+-- 24
+('Which of the following mantras is compatible with a Magnet Spark?', 'Lightning Stream', 'Iron Tether', 'Ice Chains', 'b'),
+-- 25
+('What monster weapon was retextured?', 'Enforcer', 'Sand Knight', 'Krysguards', 'a'),
+-- 26
+('Which of these oaths cannot be skipped using knowledge', 'Blightsurger', 'Chainwarden', 'Starkindred', 'b'),
+-- 27
+('What talent tree does "STRENGTH UNBOUNDED" belong to?', 'Beast', 'Strongman', 'One Eyed King', 'c'),
+-- 28
+('Where is the NPC "The Guy" located?', 'Bluster Rift', 'Aratel Sea', 'Meteor Isle', 'a'),
+-- 29
+('Which of these enemies is never seen wearing a head accessory', 'Grudge', 'Gigamed', 'Ministry Scout', 'b'),
+-- 30
+('What exclusive item does "The Guy" give?', 'The Guy''s Glasses', 'The Guy''s Outfit', 'The Guy''s Hat', 'a'),
+-- 31
+('Which of these can a Wishmaker NOT do', 'Give you the EXP to reach P20', 'Grant an extra trait', 'Enchant a weapon with Astral', 'b'),
+-- 32
+('Which of the following locations does NOT feature a Carbuncle spawn?', 'Starfield Tundra', 'Starfield Grove', 'Starfield Veldt', 'b'),
+-- 33
+('Which of these oaths does not have a permanent visual indicator', 'Fadetrimmer', 'Arcwarder', 'Bladeharper', 'b'),
+-- 34
+('Which talent gives you 10% extra resistance', 'Padded Armour', 'Exposed Durability', 'Exoskeleton', 'c'),
+-- 35
+('How many gliders are in deepwoken', '3', '4', '5', 'b'),
+-- 36
+('Who is not a dev for deepwoken?', 'Agamatsu', 'MikePike', 'Melonbeard', 'b'),
+-- 37
+('Which spark makes dash usable twice in a row', 'Multiplying Spark', 'Spring Spark', 'Blast Spark', 'b'),
+-- 38
+('What does it mean to be a deepwoken', 'Eating a Drowned God', 'Being a Prophet', 'Mastering an Attunement', 'a'),
+-- 39
+('How many variants of skinned instruments are there', '3', '2', '4', 'a'),
+-- 40
+('Clicking on a mantra modifier is supposed to lead you to the nearest', 'Blacksmith', 'Banker', 'Mantra Modifying Table', 'c'),
+-- 41
+('Which equipment piece has the talent "Temple Guard"', 'Evanspear Warplate', 'Ascended Outlaw Hat', 'Monastery Champion''s Robes', 'c'),
+-- 42
+('What health percentage range do you need to be to proc shadow assault blast spark', 'Below 50%', 'Below 40%', 'Above 60%', 'b'),
+-- 43
+('What color eyes does Primadon have', 'Yellow', 'Light Blue', 'Green', 'a'),
+-- 44
+('How many legs does Widow have', '8', '6', '10', 'a'),
+-- 45
+('How many scars does Elder Primadon have', '6', '7', '2', 'b'),
+-- 46
+('How many eyes do Stone Knights have', '5', '3', '4', 'c'),
+-- 47
+('How many naturally spawning event meteors are there?', '4', '5', '6', 'b'),
+-- 48
+('How many Crazy Slot weapons are there', '5', '6', '7', 'b'),
+-- 49
+('What color are the Crazy Slot weapons when corrupted', 'Vantablack', 'Purple', 'Pale White', 'b'),
+-- 50
+('How many horns do Mudskippers have', '3', '4', '5', 'b'),
+-- 51
+('How many eyes do Enforcers have', '4', '6', '2', 'b'),
+-- 52
+('How many eyes does Bounder have', '8', '10', '12', 'c'),
+-- 53
+('How many horns does Ethiron have', '2', '4', '0', 'b'),
+-- 54
+('How many ships are there', '5', '6', '7', 'b'),
+-- 55
+('How many rooms does a max guild base have?', '12', '13', '11', 'b'),
+-- 56
+('How many disguise variants are there', '6', '7', '8', 'b'),
+-- 57
+('How many non gold fish items are in the game', '5', '6', '7', 'b'),
+-- 58
+('How many Ganymede hats are there', '3', '5', '6', 'a'),
+-- 59
+('How many cannons does an Ironclad have?', '16', '18', '20', 'c'),
+-- 60
+('Which foot does a brainsucker kick with', 'Right', 'Left', 'Hands', 'a'),
+-- 61
+('"Your natural skill in mediating conflict makes people think more highly of you." is a part of which talent''s description?', 'Pardon Me', 'Cult of Personality', 'Celebrity', 'c');
+
+COMMIT;
+
+-- Note:
+-- - Obvious typos fixed (e.g., ASSALT -> ASSAULT, Monestary -> Monastery, etc.).
+-- - Discord meta lines and non-conforming items (no A/B/C) were omitted.
+-- - Text uses utf8mb4 for full Unicode support.
