@@ -12,14 +12,28 @@ class GameController extends Controller
     protected function initBoard(): array
     {
         if (!Session::has('h2h.board')) {
-            // Fixed 10 spaces (indexes 0..9). Player starts at 7, Chaser at 9.
+            // Fixed 11 spaces (indexes 0..10). Player starts at 8, Chaser at 10.
             Session::put('h2h.board', [
-                'size'      => 10, // total cells
-                'playerPos' => 7,
-                'chaserPos' => 9,
+                'size'      => 11, // total cells
+                'playerPos' => 8,
+                'chaserPos' => 10,
                 'homeIndex' => 0,
             ]);
             Session::forget(['h2h.state','h2h.current_q']);
+        }
+        // Auto-upgrade legacy boards (previous size 10) to new size 11 without forcing reset
+        $board = Session::get('h2h.board');
+        if (isset($board['size']) && $board['size'] === 10) {
+            // Preserve relative distance: if old player at 7/8/ etc, shift by +1 when expanding upper bound
+            $player = $board['playerPos'];
+            $chaser = $board['chaserPos'];
+            // Only shift if original chaser was at last cell (9)
+            if ($chaser === 9) { $chaser = 10; }
+            if ($player >= 7) { $player = min($player + 1, 10); }
+            $board['size'] = 11;
+            $board['playerPos'] = $player;
+            $board['chaserPos'] = $chaser;
+            Session::put('h2h.board', $board);
         }
         if (!Session::has('h2h.current_q')) {
             Session::put('h2h.current_q', $this->randomQuestion());
@@ -168,8 +182,8 @@ class GameController extends Controller
     public function setPositions(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'playerPos' => 'required|integer|min:0|max:9',
-            'chaserPos' => 'required|integer|min:0|max:9',
+            'playerPos' => 'required|integer|min:0|max:10',
+            'chaserPos' => 'required|integer|min:0|max:10',
         ]);
         $board = $this->initBoard();
         $board['playerPos'] = $data['playerPos'];

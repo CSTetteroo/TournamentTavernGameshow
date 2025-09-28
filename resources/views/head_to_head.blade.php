@@ -81,8 +81,8 @@ h1{font-family:Orbitron,sans-serif;letter-spacing:.05em;text-transform:uppercase
         <span><i class="badge chaser"></i> Chaser</span>
       </div>
       <div class="position-admin" id="positionAdmin">
-        <label>Player<input type="number" min="0" max="9" id="playerPosInput" /></label>
-        <label>Chaser<input type="number" min="0" max="9" id="chaserPosInput" /></label>
+  <label>Player<input type="number" min="0" max="10" id="playerPosInput" /></label>
+  <label>Chaser<input type="number" min="0" max="10" id="chaserPosInput" /></label>
         <button type="button" id="updatePositionsBtn">UPDATE</button>
       </div>
     </div>
