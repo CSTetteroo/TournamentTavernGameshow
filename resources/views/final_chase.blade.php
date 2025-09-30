@@ -290,7 +290,7 @@
         }
 
         .question-wrap:focus-visible { outline: 2px solid rgba(87,241,255,.8); outline-offset:4px; }
-        .question-cover { display:grid; place-items:center; gap:12px; text-align:center; padding:12px 4px; }
+        .question-cover { display:grid; place-items:center; gap:12px; text-align:center; padding:0px 4px; }
 
         .question-wrap .question {
             display: none;
@@ -377,7 +377,7 @@
             place-items: center;
             gap: 12px;
             text-align: center;
-            padding: 12px 4px;
+            padding: 0px 4px;
         }
 
         .reveal-title {
