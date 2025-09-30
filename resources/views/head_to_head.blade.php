@@ -27,6 +27,7 @@
 
         * {
             box-sizing: border-box;
+
         }
 
         body {
@@ -37,6 +38,7 @@
             min-height: 100dvh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         h1 {
@@ -277,8 +279,8 @@
             font-size: clamp(18px, 2vw, 24px);
             font-weight: 700;
             line-height: 1.3;
-            margin: 0 0 18px;
-            min-height: 56px;
+            margin: 0 0 8px;
+            min-height: 24px;
             display: flex;
             align-items: flex-start;
         }
@@ -488,6 +490,24 @@
             background: linear-gradient(90deg, transparent, var(--line), transparent);
             margin: 10px 0;
         }
+
+        /* Prize ladder (mirrors round2 minimal subset) now separate side box */
+    .question-layout { display:flex; align-items:stretch; gap:12px; }
+    .question-layout .panel { flex:1; display:flex; flex-direction:column; }
+    .question-layout .panel #questionArea { flex:1; display:flex; flex-direction:column; }
+    .question-layout .panel #questionArea .options { flex:0 0 auto; }
+    .question-layout .panel #questionArea .actions { margin-top:auto; }
+    .prize-ladder { flex:0 0 260px; display:flex; flex-direction:column; font-family: Orbitron, Montserrat, sans-serif; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border:1px solid var(--line); border-radius:16px; padding:16px 18px 12px; box-shadow:0 6px 18px -6px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,0.04); }
+    .prize-ladder .tier-row:last-child { margin-bottom:auto; }
+        .prize-ladder h3 { margin:0 0 12px; font-size:14px; letter-spacing:.18em; text-transform:uppercase; opacity:.85; }
+        .tier-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 10px; border-radius:10px; margin-bottom:6px; font-size:12px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
+        .tier-row.active { background: linear-gradient(90deg, rgba(94,177,255,.25), rgba(94,231,255,.25)); box-shadow: inset 0 0 0 1px rgba(94,231,255,.45); }
+        .tier-row .prize { font-weight:700; color: var(--gold); letter-spacing:.04em; }
+        .tier-row:last-child { margin-bottom:0; }
+        @media (max-width: 1000px){
+            .question-layout { flex-direction:column; }
+            .prize-ladder { width:100%; }
+        }
     </style>
 </head>
 
@@ -513,41 +533,54 @@
                 </div>
             </div>
         </div>
-        <div id="panel" class="panel fade-in">
-            <div id="statusWrap"></div>
-            <div id="questionArea">
-                <div id="questionText" class="qtext"></div>
-                <div class="options" id="options"></div>
-                <div class="answer-entry" id="manualInputs" style="display:flex;">
-                    <label for="playerSelect">Player</label>
-                    <select id="playerSelect" aria-label="Player answer">
-                        <option value="" selected disabled>--</option>
-                        <option value="a">A</option>
-                        <option value="b">B</option>
-                        <option value="c">C</option>
-                    </select>
-                    <label for="chaserSelect">Chaser</label>
-                    <select id="chaserSelect" aria-label="Chaser answer">
-                        <option value="" selected disabled>--</option>
-                        <option value="a">A</option>
-                        <option value="b">B</option>
-                        <option value="c">C</option>
-                    </select>
-                    <button class="submit-answers" id="submitBoth" disabled type="button">Lock Answers</button>
-                    <small>(Select both answers & lock)</small>
+        <div class="question-layout">
+            <div id="panel" class="panel fade-in">
+                <div id="statusWrap"></div>
+                <div id="questionArea">
+                    <div id="questionText" class="qtext"></div>
+                    <div class="divider-line"></div>
+                    <div class="options" id="options"></div>
+                    <div class="answer-entry" id="manualInputs" style="display:flex;">
+                        <label for="playerSelect">Player</label>
+                        <select id="playerSelect" aria-label="Player answer">
+                            <option value="" selected disabled>--</option>
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="c">C</option>
+                        </select>
+                        <label for="chaserSelect">Chaser</label>
+                        <select id="chaserSelect" aria-label="Chaser answer">
+                            <option value="" selected disabled>--</option>
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="c">C</option>
+                        </select>
+                        <button class="submit-answers" id="submitBoth" disabled type="button">Lock Answers</button>
+                        <small>(Select both answers & lock)</small>
+                    </div>
+                    <div class="divider-line"></div>
+                    <div class="actions">
+                        <button class="btn" id="nextQuestionBtn" type="button" style="display:none;">Next Question</button>
+                        <button class="btn alt" id="resetBtn" type="button">Reset Round</button>
+                    </div>
                 </div>
-                <div class="divider-line"></div>
-                <div class="notice">Lock answers → board highlights correct option → after review click Next Question.
-                </div>
-                <div class="actions">
-                    <button class="btn" id="nextQuestionBtn" type="button" style="display:none;">Next
-                        Question</button>
-                    <button class="btn alt" id="resetBtn" type="button">Reset Round</button>
+                <div id="endActions" class="actions" style="display:none;">
+                    <button class="btn" id="playAgain" type="button">Play Again</button>
                 </div>
             </div>
-            <div id="endActions" class="actions" style="display:none;">
-                <button class="btn" id="playAgain" type="button">Play Again</button>
-            </div>
+            <aside class="prize-ladder fade-in" aria-label="Prize ladder">
+                <h3>Prize Ladder</h3>
+                <div class="tier-row"><span>01</span><span class="prize">5 Moonseyes</span></div>
+                <div class="tier-row"><span>02</span><span class="prize">15 Idols, 5 Moonseyes</span></div>
+                <div class="tier-row"><span>03</span><span class="prize">Whistling Periapt</span></div>
+                <div class="tier-row"><span>04</span><span class="prize">Obt Relic of Choice</span></div>
+                <div class="tier-row"><span>05</span><span class="prize">Obt Item of Choice</span></div>
+                <div class="tier-row"><span>06</span><span class="prize">Name</span></div>
+                <div class="tier-row"><span>07</span><span class="prize">Name + Mantle</span></div>
+                <div class="tier-row"><span>08</span><span class="prize">Name + Title</span></div>
+                <div class="tier-row"><span>09</span><span class="prize">Name + Title + Mantle</span></div>
+                <div class="tier-row"><span>10</span><span class="prize">Name + Title + Obt item</span></div>
+            </aside>
         </div>
     </div>
     <script>
