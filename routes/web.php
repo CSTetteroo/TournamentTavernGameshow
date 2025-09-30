@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\MultipleChoiceQuestionController;
+use App\Http\Controllers\FinalChaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +45,10 @@ Route::post('/head-to-head/set-positions', [GameController::class, 'setPositions
 // Multiple choice question bank (separate from qa_pairs)
 Route::get('/mcq', [MultipleChoiceQuestionController::class, 'index'])->name('mcq.index');
 Route::post('/mcq/reset-used', [MultipleChoiceQuestionController::class, 'resetUsed'])->name('mcq.reset');
+
+// Final Chase (rapid fire) routes
+Route::get('/final-chase', [FinalChaseController::class, 'show'])->name('final.chase.show');
+Route::get('/final-chase/next', [FinalChaseController::class, 'next'])->name('final.chase.next');
+Route::post('/final-chase/score', [FinalChaseController::class, 'score'])->name('final.chase.score');
+Route::post('/final-chase/reset', [FinalChaseController::class, 'reset'])->name('final.chase.reset');
 
