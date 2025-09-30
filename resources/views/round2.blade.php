@@ -336,7 +336,7 @@
         const answerCard = document.getElementById('answerCard');
         const answerText = document.getElementById('answerText');
         const questionWrap = document.getElementById('questionWrap');
-        // Timer elements
+    // Timer elements
         const timeEl = document.getElementById('time');
         const timeInput = document.getElementById('timeInput');
         const setTimerBtn = document.getElementById('setTimerBtn');
@@ -346,9 +346,12 @@
 
         let revealed = false; // answer revealed
         let qRevealed = false; // question revealed
-        // Timer state
-        let totalSeconds = 0; // countdown remaining
-        let timerId = null;
+    // Timer state (persistent)
+    let totalSeconds = 0; // countdown remaining (when paused or before start)
+    let timerId = null;
+    let endTime = null; // epoch ms when countdown hits zero (only set while running)
+    const LS_KEY_END = 'round2TimerEnd';      // stores endTime when running
+    const LS_KEY_REM = 'round2TimerRemain';   // stores remaining seconds when paused
 
         function setQuestionVisible(show) {
             qRevealed = !!show;
@@ -402,38 +405,124 @@
             if (Number.isNaN(m) || Number.isNaN(s) || m < 0 || s < 0 || s >= 60) return null;
             return m * 60 + s;
         }
-        function tick() {
-            if (totalSeconds > 0) {
-                totalSeconds -= 1;
+        function computeRemaining() {
+            if (!endTime) return totalSeconds; // paused state
+            const now = Date.now();
+            // Use ceil so partial seconds don't visually skip (e.g., 47.8 -> 47, then 46.1 -> 46)
+            const diff = Math.ceil((endTime - now) / 1000);
+            return diff > 0 ? diff : 0;
+        }
+
+        let lastDisplayed = null;
+        function updateFromEndTime() {
+            const remain = computeRemaining();
+            if (remain !== lastDisplayed) {
+                totalSeconds = remain;
                 renderTime();
-                if (totalSeconds === 0) {
-                    // Auto-reveal answer on zero
-                    reveal();
-                    stopTimer();
-                }
+                lastDisplayed = remain;
+            } else {
+                totalSeconds = remain; // keep internal sync
+            }
+            if (endTime && remain === 0) {
+                reveal();
+                clearPersisted();
+                stopTimer();
             }
         }
+
+        function tick() { updateFromEndTime(); }
+
         function startTimer() {
             if (timerId || totalSeconds <= 0) return;
-            timerId = setInterval(tick, 1000);
+            // Faster interval reduces drift & provides smoother second transitions
+            timerId = setInterval(tick, 250);
+            tick(); // immediate sync
         }
+
         function stopTimer() {
             if (timerId) { clearInterval(timerId); timerId = null; }
         }
+
+        function clearPersisted() {
+            localStorage.removeItem(LS_KEY_END);
+            localStorage.removeItem(LS_KEY_REM);
+            endTime = null;
+        }
+
         function resetTimer() {
             stopTimer();
+            clearPersisted();
             totalSeconds = 0;
             renderTime();
         }
+
+        function setNewTimer(seconds) {
+            // Set WITHOUT starting. Store as remaining.
+            stopTimer();
+            clearPersisted();
+            if (seconds <= 0) { resetTimer(); return; }
+            totalSeconds = seconds;
+            renderTime();
+            localStorage.setItem(LS_KEY_REM, String(totalSeconds));
+        }
+
         setTimerBtn?.addEventListener('click', () => {
             const v = parseInput(timeInput.value);
             if (v == null) { alert('Enter mm:ss (e.g., 01:30)'); return; }
-            totalSeconds = v; renderTime();
+            setNewTimer(v);
         });
-        startBtn?.addEventListener('click', startTimer);
-        pauseBtn?.addEventListener('click', stopTimer);
+        startBtn?.addEventListener('click', () => {
+            // If no time set but an input value exists, stage it first (paused state)
+            if (!endTime && totalSeconds === 0 && timeInput.value) {
+                const v = parseInput(timeInput.value);
+                if (v != null) setNewTimer(v);
+            }
+            if (totalSeconds > 0 && !endTime) {
+                // Transition from paused/staged to running
+                endTime = Date.now() + totalSeconds * 1000;
+                localStorage.setItem(LS_KEY_END, String(endTime));
+                localStorage.removeItem(LS_KEY_REM);
+                updateFromEndTime();
+                startTimer();
+            }
+        });
+        pauseBtn?.addEventListener('click', () => {
+            if (endTime) {
+                // Currently running: freeze remaining
+                updateFromEndTime(); // ensure latest remaining
+                stopTimer();
+                // Persist remaining seconds
+                localStorage.setItem(LS_KEY_REM, String(totalSeconds));
+                localStorage.removeItem(LS_KEY_END);
+                endTime = null;
+            } // if already paused do nothing
+        });
         resetBtn?.addEventListener('click', resetTimer);
-        renderTime();
+
+        // On load: restore persisted endTime if exists
+        (function restoreTimer(){
+            const runningTs = localStorage.getItem(LS_KEY_END);
+            const pausedRemain = localStorage.getItem(LS_KEY_REM);
+            if (runningTs) {
+                const ts = parseInt(runningTs, 10);
+                if (!Number.isNaN(ts) && ts > Date.now()) {
+                    endTime = ts;
+                    updateFromEndTime();
+                    startTimer();
+                    return;
+                } else {
+                    // expired
+                    clearPersisted();
+                }
+            }
+            if (pausedRemain) {
+                const rem = parseInt(pausedRemain, 10);
+                if (!Number.isNaN(rem) && rem > 0) {
+                    totalSeconds = rem;
+                }
+            }
+            renderTime();
+        })();
 
         // Confetti (simple, lightweight)
         const canvas = document.getElementById('confetti');
