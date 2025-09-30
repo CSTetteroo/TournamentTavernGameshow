@@ -22,7 +22,7 @@
             --glass: rgba(255, 255, 255, .08);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; overflow: hidden; }
 
         html,
         body {
@@ -314,7 +314,7 @@
             text-transform: uppercase;
         }
 
-        .question { margin:6px 0 0; font-weight:900; font-size:clamp(24px,4.2vw,60px); line-height:1.05; text-shadow:0 6px 22px rgba(0,0,0,.45),0 0 22px rgba(0,230,255,.25); }
+        .question { margin:6px 0 0; font-weight:900; font-size:clamp(24px,4.2vw,36px); line-height:1.05; text-shadow:0 6px 22px rgba(0,0,0,.45),0 0 22px rgba(0,230,255,.25); }
 
         @keyframes pop {
             0% {
@@ -401,6 +401,7 @@
         .answer.revealed {
             display: block;
             animation: pop .35s ease;
+            font-size: clamp(22px, 3.2vw, 30px);
         }
 
         .answer-card.revealed .reveal-cover {
