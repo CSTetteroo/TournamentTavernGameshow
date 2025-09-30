@@ -22,9 +22,7 @@
             --glass: rgba(255, 255, 255, .08);
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         html,
         body {
@@ -50,17 +48,8 @@
         }
 
         @keyframes twinkle {
-
-            0%,
-            100% {
-                opacity: .2;
-                transform: translateY(0);
-            }
-
-            50% {
-                opacity: .5;
-                transform: translateY(-6px);
-            }
+            0%, 100% { opacity: .35; transform: translateY(0); }
+            50% { opacity: .55; transform: translateY(-6px); }
         }
 
         .container {
@@ -90,26 +79,12 @@
             background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--gold), var(--accent), var(--accent-2));
             filter: blur(22px);
             opacity: .15;
+            z-index: 0;
             animation: hue 12s linear infinite;
             pointer-events: none;
         }
 
-        @keyframes hue {
-            to {
-                filter: blur(22px) hue-rotate(360deg);
-            }
-        }
-
-        header {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: clamp(16px, 2vw, 24px);
-        }
+        @keyframes hue { to { filter: blur(22px) hue-rotate(360deg); } }
 
         .brand {
             display: flex;
@@ -292,59 +267,96 @@
             margin-left: auto;
         }
 
-        /* Q/A Blocks */
+        /* Q/A Blocks (Round1 exact styling with smaller text) */
         .qa {
             margin-top: 24px;
             display: grid;
-            gap: 22px;
+            gap: 24px;
         }
 
-        .qcard {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, .14);
-            border-radius: 22px;
-            padding: 24px;
-            cursor: pointer;
+        .question-wrap {
             position: relative;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+            z-index: 1;
+            padding: clamp(16px, 2vw, 30px);
+            border-radius: 22px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.04);
+            cursor: pointer;
         }
 
-        /* Match Round1 answer-card styling */
-        .acard {
+        .question-wrap:hover {
+            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.06), 0 8px 22px rgba(0, 0, 0, .25);
+        }
+
+        .question-wrap:focus-visible { outline: 2px solid rgba(87,241,255,.8); outline-offset:4px; }
+        .question-cover { display:grid; place-items:center; gap:12px; text-align:center; padding:12px 4px; }
+
+        .question-wrap .question {
+            display: none;
+        }
+
+        .question-wrap.q-revealed .question-cover {
+            display: none;
+        }
+
+        .question-wrap.q-revealed .question {
+            display: block;
+            animation: pop .35s ease;
+        }
+
+        .question-label {
+            font-family: Orbitron, sans-serif;
+            font-size: 12px;
+            letter-spacing: .2em;
+            opacity: .9;
+            color: #a6c8ff;
+            text-transform: uppercase;
+        }
+
+        .question { margin:6px 0 0; font-weight:900; font-size:clamp(24px,4.2vw,60px); line-height:1.05; text-shadow:0 6px 22px rgba(0,0,0,.45),0 0 22px rgba(0,230,255,.25); }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.9);
+                opacity: .5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .answer-wrap {
+            position: relative;
+            z-index: 1;
+        }
+
+        .answer-card {
             position: relative;
             border-radius: 20px;
             padding: clamp(18px, 3.2vw, 32px);
-            background: linear-gradient(180deg, rgba(10, 14, 30, .7), rgba(14, 18, 40, .9));
-            border: 1px solid rgba(255, 255, 255, .16);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .06);
+            background: linear-gradient(180deg, rgba(10, 14, 30, 0.7), rgba(14, 18, 40, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
             cursor: pointer;
             user-select: none;
             transition: transform .25s ease, box-shadow .25s ease;
             outline: none;
             overflow: hidden;
         }
-        #timeDisplay{
-            width: 90px;
-        }
-        .acard:hover {
+
+        .answer-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .08);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
         }
 
-        .acard:active {
+        .answer-card:active {
             transform: translateY(0);
         }
 
-        .acard::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            pointer-events: none;
-            background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .18) 15%, transparent 30%);
-            transform: translateX(-120%);
-            animation: shimmer 4.8s ease-in-out infinite;
-        }
+        .answer-card::before { content:""; position:absolute; inset:0; border-radius:20px; pointer-events:none; background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.18) 15%, transparent 30%); transform:translateX(-120%); animation:shimmer 4.8s ease-in-out infinite; }
 
         @keyframes shimmer {
             0% {
@@ -363,58 +375,45 @@
         .reveal-cover {
             display: grid;
             place-items: center;
-            gap: 10px;
-            padding: 12px 4px;
+            gap: 12px;
             text-align: center;
+            padding: 12px 4px;
         }
 
-        .qtext {
-            display: none;
-            font: 800 clamp(24px, 3.2vw, 60px) Montserrat, sans-serif;
-            margin: 0;
+        .reveal-title {
+            font-family: Orbitron, sans-serif;
+            font-weight: 900;
+            font-size: clamp(16px, 2vw, 26px);
+            letter-spacing: .1em;
+            color: #bde7ff;
+            text-transform: uppercase;
         }
 
-        .qcard.revealed .reveal-cover {
-            display: none;
+        .reveal-icon {
+            width: 40px;
+            height: 40px;
+            color: #bde7ff;
+            filter: drop-shadow(0 0 8px rgba(0, 230, 255, .4));
         }
 
-        .qcard.revealed .qtext {
+        .answer { display:none; font-size:clamp(22px,3.2vw,48px); font-weight:800; line-height:1.15; color:#ffffff; text-shadow:0 0 22px rgba(255,0,243,.35),0 0 14px rgba(0,230,255,.28); }
+
+        .answer.revealed {
             display: block;
-            animation: fade .35s ease;
+            animation: pop .35s ease;
         }
 
-        .answer {
-            display: none;
-            font: 800 clamp(22px, 2.4vw, 50px)/1.1 Montserrat, sans-serif;
-            color: #ffffff;
-            text-shadow: 0 0 22px rgba(255, 0, 243, .35), 0 0 14px rgba(0, 230, 255, .28);
-        }
-
-        .acard.revealed .reveal-cover {
+        .answer-card.revealed .reveal-cover {
             display: none;
         }
 
-        .acard.revealed .answer {
-            display: block;
-            animation: fade .35s ease;
+        .answer-card.revealed {
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(0, 230, 255, .25) inset;
         }
 
-        .acard.revealed {
-            box-shadow: 0 16px 38px rgba(0, 0, 0, .55), 0 0 0 3px rgba(0, 230, 255, .25) inset;
-        }
-
-        @keyframes fade {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        header { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:clamp(16px,2vw,24px); }
+        header .brand { display:flex; align-items:center; gap:14px; flex:1 1 auto; min-width:260px; }
+        header > .badge[title="Mode"] { flex:0 0 auto; white-space:nowrap; }
         @media (max-width:720px) {
             .bars {
                 flex-direction: column;
@@ -424,10 +423,7 @@
                 height: 22px;
             }
 
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            header { flex-direction:column; align-items:flex-start; }
 
             .brand {
                 width: 100%;
@@ -514,17 +510,35 @@
             </div>
 
             <div class="qa">
-                <div class="qcard" id="questionBox" tabindex="0" role="button" aria-expanded="false">
-                    <div class="reveal-cover">
-                        <div style="font:800 18px Orbitron,sans-serif;letter-spacing:.12em;">Reveal Question</div>
+                <div class="question-wrap" id="questionWrap" role="button" tabindex="0" aria-expanded="false"
+                    aria-label="Reveal question">
+                    <div class="question-cover">
+                        <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <div class="reveal-title">Reveal Question</div>
                     </div>
-                    <h2 class="qtext" id="questionText">{{ $question?->question ?? 'No question available' }}</h2>
+                    <h2 id="questionText" class="question">
+                        <div class="question-label">Question</div>
+                        {{ $question?->question ?? 'No question available' }}
+                    </h2>
                 </div>
-                <div class="acard" id="answerBox" tabindex="0" role="button" aria-expanded="false">
-                    <div class="reveal-cover">
-                        <div style="font:800 18px Orbitron,sans-serif;letter-spacing:.12em;">Reveal Answer</div>
+                <div class="answer-wrap">
+                    <div id="answerCard" class="answer-card" role="button" tabindex="0" aria-expanded="false"
+                        aria-controls="answerText" data-answer="{{ $question?->answer ?? '' }}">
+                        <div class="reveal-cover">
+                            <svg class="reveal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <div class="reveal-title">Reveal Answer</div>
+                        </div>
+                        <div id="answerText" class="answer" aria-hidden="true"></div>
                     </div>
-                    <div class="answer" id="answerText" aria-hidden="true">{{ $question?->answer ?? '' }}</div>
                 </div>
                 <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
                     <button class="btn" id="correctBtn" type="button"
@@ -547,11 +561,11 @@
         const sideSelect = document.getElementById('sideSelect');
         const correctBtn = document.getElementById('correctBtn');
         const wrongBtn = document.getElementById('wrongBtn');
-    const nextContainer = null; // removed
+        const nextContainer = null; // removed
+        const questionWrap = document.getElementById('questionWrap');
         const questionText = document.getElementById('questionText');
+        const answerCard = document.getElementById('answerCard');
         const answerText = document.getElementById('answerText');
-        const questionBox = document.getElementById('questionBox');
-        const answerBox = document.getElementById('answerBox');
         // Timer
         const timeDisplay = document.getElementById('timeDisplay');
         const timeInput = document.getElementById('timeInput');
@@ -593,11 +607,15 @@
             updateBars();
         }
 
-        async function scoreAndNext(delta){
+        async function scoreAndNext(delta) {
             const side = sideSelect.value;
-            if(delta < 0 && side !== 'chaser') { /* no change for contestant wrong */ }
-            else if(delta < 0 && side === 'chaser'){ await adjustScore('chaser', -1); }
-            else if(delta > 0){ await adjustScore(side, 1); }
+            if (delta < 0 && side !== 'chaser') {
+                /* no change for contestant wrong */
+            } else if (delta < 0 && side === 'chaser') {
+                await adjustScore('chaser', -1);
+            } else if (delta > 0) {
+                await adjustScore(side, 1);
+            }
             await nextQuestion();
         }
         correctBtn.addEventListener('click', () => scoreAndNext(1));
@@ -606,17 +624,48 @@
         async function nextQuestion() {
             const res = await fetch('{{ route('final.chase.next') }}');
             const data = await res.json();
-            questionText.textContent = data.question || 'No question';
-            answerText.textContent = data.answer || '';
-            questionBox.classList.remove('revealed');
-            answerBox.classList.remove('revealed');
-            questionBox.classList.remove('q-revealed');
-            answerBox.classList.remove('a-revealed');
+            questionText.childNodes.forEach(n => {
+                if (n.nodeType === 3) n.remove();
+            });
+            questionText.append(document.createTextNode(data.question || 'No question'));
+            answerText.textContent = '';
+            answerCard.dataset.answer = data.answer || '';
+            questionWrap.classList.remove('q-revealed');
+            answerCard.classList.remove('revealed');
+            answerText.classList.remove('revealed');
             // next button removed
         }
         // Auto advance only via scoring now.
-        questionBox.addEventListener('click', () => questionBox.classList.add('revealed'));
-        answerBox.addEventListener('click', () => { answerBox.classList.add('revealed'); });
+        function setQuestionVisible(show) {
+            questionWrap.classList.toggle('q-revealed', !!show);
+            questionWrap.setAttribute('aria-expanded', String(!!show));
+        }
+
+        function setAnswerVisible(show) {
+            if (show) {
+                if (!answerText.textContent) {
+                    answerText.textContent = answerCard.dataset.answer || 'Answer';
+                }
+            }
+            answerCard.classList.toggle('revealed', !!show);
+            answerText.classList.toggle('revealed', !!show);
+            answerCard.setAttribute('aria-expanded', String(!!show));
+            answerText.setAttribute('aria-hidden', String(!show));
+        }
+        questionWrap.addEventListener('click', () => setQuestionVisible(true));
+        questionWrap.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                setQuestionVisible(true);
+            }
+        });
+        answerCard.addEventListener('click', () => setAnswerVisible(true));
+        answerCard.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                setAnswerVisible(true);
+            }
+        });
 
         // Timer logic (simple, local only) ------------------
         let countdown = 90; // seconds
