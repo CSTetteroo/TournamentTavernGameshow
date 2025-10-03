@@ -163,16 +163,19 @@
 
         .board {
             display: flex;
-            gap: 16px;
+            gap: 5px;
             transition: .4s;
-            justify-content: flex-start;
+            justify-content: stretch;
             flex-wrap: nowrap;
             min-height: 110px;
             overflow: visible;
+            width: 100%;
         }
 
+        /* Cells now auto-resize to fit full width so all spaces are visible without scrolling */
         .board .cell {
-            flex: 0 0 94px;
+            flex: 1 1 0;
+            min-width: 0; /* allow shrink */
         }
 
         .cell {
@@ -187,7 +190,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 12px;
             color: var(--muted);
             overflow: visible;
             isolation: isolate;
@@ -226,7 +229,6 @@
         .cell .label {
             position: absolute;
             bottom: 4px;
-            right: 8px;
             font-size: 11px;
             opacity: .55;
             letter-spacing: .08em;
@@ -523,7 +525,7 @@
                 </div>
                 <div class="position-admin" id="positionAdmin">
                     <label>Player<input type="number" min="0" max="10" id="playerPosInput" /></label>
-                    <label>Chaser<input type="number" min="0" max="10" id="chaserPosInput" /></label>
+                    <label>Chaser<input type="number" min="0" max="11" id="chaserPosInput" /></label>
                     <button type="button" id="updatePositionsBtn">UPDATE</button>
                 </div>
             </div>
@@ -611,8 +613,10 @@
             for (let i = 0; i < size; i++) {
                 let cls = 'cell';
                 if (i === 0) cls += ' home';
-                if (i === playerPos && i === chaserPos) cls += ' caught';
-                else {
+                // Square 11 (chaser square) is chaser-only; prevent collision display
+                if (i === playerPos && i === chaserPos && i !== size - 1) {
+                    cls += ' caught';
+                } else {
                     if (i === playerPos) cls += ' player';
                     if (i === chaserPos) cls += ' chaser';
                 }
@@ -623,11 +627,20 @@
                 div.className = cls;
                 const label = document.createElement('span');
                 label.className = 'label';
-                label.textContent = i === 0 ? 'HOME' : `S${i}`;
+                if (i === 0) label.textContent = 'HOME';
+                else if (i === size - 1) label.textContent = 'CHASE';
+                else label.textContent = `S${i}`;
                 div.appendChild(label);
                 const main = document.createElement('div');
-                main.textContent = (i === playerPos && i === chaserPos) ? 'CAUGHT' : (i === playerPos ? 'PLAYER' : (i ===
-                    chaserPos ? 'CHASER' : ''));
+                if (i === playerPos && i === chaserPos && i !== size - 1) {
+                    main.textContent = 'CAUGHT';
+                } else if (i === playerPos) {
+                    main.textContent = 'PLAYER';
+                } else if (i === chaserPos) {
+                    main.textContent = 'CHASER';
+                } else {
+                    main.textContent = '';
+                }
                 boardEl.appendChild(div);
                 if (main.textContent) div.insertBefore(main, label);
             }
@@ -807,8 +820,8 @@
         updatePositionsBtn.addEventListener('click', async () => {
             const p = parseInt(playerPosInput.value, 10);
             const c = parseInt(chaserPosInput.value, 10);
-            if (Number.isNaN(p) || Number.isNaN(c) || p < 0 || p > 9 || c < 0 || c > 9) {
-                alert('Positions must be integers 0-9');
+            if (Number.isNaN(p) || Number.isNaN(c) || p < 0 || p > 10 || c < 0 || c > 11) {
+                alert('Player must be 0-10 and Chaser 0-11');
                 return;
             }
             try {
