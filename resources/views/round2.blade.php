@@ -651,6 +651,17 @@
             </div>
         </section>
     </div>
+    <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:5;font-family:Montserrat,system-ui,sans-serif;">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(10,18,35,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:8px 14px;border:1px solid rgba(255,255,255,0.14);border-radius:999px;font-size:11px;letter-spacing:.06em;color:#b8c6e2;max-width:92vw;">
+            <span style="font-weight:700;color:#57f1ff;text-transform:uppercase;font-size:10px;opacity:.85;">Thanks</span>
+            <span aria-hidden="true" style="opacity:.4;">|</span>
+            <span style="white-space:nowrap;">[Questions]: Thatoneguy_o · Aswqe · Shiny · leron7 · cam2 · KOWZ · Wormcave · Sillybillycar2 · Blahamus · Equal_dark</span>
+            <span aria-hidden="true" style="opacity:.4;">|</span>
+            <span style="white-space:nowrap;">[Website]: · Onteal</span>
+            <span aria-hidden="true" style="opacity:.4;">|</span>
+            <span style="white-space:nowrap;">[Chaser Profile Picture]: · V1kov</span>
+        </div>
+    </div>
 
     <script>
         const answerCard = document.getElementById('answerCard');
