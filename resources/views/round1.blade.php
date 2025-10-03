@@ -208,6 +208,44 @@
             .controls { width: 100%; }
             .btn { flex: 1; }
         }
+
+        /* Roster panel (Red / Blue Teams) */
+        .roster-panel {
+            position: fixed; top: 50%; right: 10px; transform: translateY(-50%);
+            width: 210px; max-height: 80vh; overflow: hidden;
+            background: rgba(10,18,35,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.14); border-radius: 18px;
+            padding: 10px 12px 12px; z-index: 40;
+            display: flex; flex-direction: column; gap: 6px;
+            box-shadow: 0 8px 28px -6px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            font-family: 'Montserrat', system-ui, sans-serif;
+        }
+        .roster-panel.collapsed { width: 70px; padding: 8px 10px 10px; }
+        .roster-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .roster-title { font-size: 11px; letter-spacing: .14em; font-weight: 700; color: #9cd9ff; opacity: .9; }
+        .roster-toggle { cursor: pointer; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #9cd9ff; border-radius: 8px; font-size: 11px; font-weight: 600; padding: 4px 8px; letter-spacing: .08em; }
+        .roster-toggle:hover { background: rgba(255,255,255,0.14); }
+        .roster-groups { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .team-block { display: flex; flex-direction: column; gap: 4px; padding: 6px 6px 8px; border-radius: 12px; position: relative; }
+        .team-block.red { background: linear-gradient(140deg, rgba(255,40,40,0.20), rgba(120,0,0,0.18)); border: 1px solid rgba(255,80,80,0.35); }
+        .team-block.blue { background: linear-gradient(140deg, rgba(40,120,255,0.20), rgba(0,40,120,0.18)); border: 1px solid rgba(80,140,255,0.35); }
+        .team-label { font-size: 10px; font-weight: 800; letter-spacing: .18em; opacity: .85; text-transform: uppercase; display: flex; align-items: center; gap:4px; }
+        .team-label .dot { width:10px; height:10px; border-radius:50%; background: currentColor; box-shadow:0 0 8px currentColor; }
+        .team-block.red .team-label { color: #ff6363; }
+        .team-block.blue .team-label { color: #63b6ff; }
+        .roster-list { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+        .roster-list label { font-size: 0; }
+        .roster-list input {
+            width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px; padding: 4px 8px 5px; font-size: 12px; font-weight: 600; color: #e6f2ff;
+            outline: none; letter-spacing: .03em; transition: border-color .2s, box-shadow .2s, background .25s;
+        }
+        .roster-list input:focus { border-color: #57f1ff; box-shadow: 0 0 0 1px #57f1ff, 0 4px 14px -4px rgba(87,241,255,0.5); background: rgba(255,255,255,0.12); }
+        .collapsed .roster-list { display: none; }
+        .collapsed .roster-groups { display: none; }
+        .collapsed .roster-title { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .2em; font-size: 10px; }
+        .collapsed .roster-toggle { padding: 4px 6px; font-size: 10px; }
+        @media (max-width: 900px) { .roster-panel { display: none; } }
     </style>
 </head>
 <body>
@@ -224,7 +262,7 @@
                         <div class="badge" aria-label="Game Show Mode">Official Deepwoken Gameshow</div>
                     </div>
                 </div>
-                <div class="badge" title="Round">Round <span id="round">1</span></div>
+                <div class="badge" title="Round">Round <span id="round">1/2</span></div>
             </header>
 
             <div class="question-wrap" id="questionWrap" role="button" tabindex="0" aria-expanded="false" aria-label="Reveal question">
@@ -263,7 +301,7 @@
             </div>
 
             <footer>
-                <div class="tip">Special thanks to:<br>thatoneguy_o, DJ_Aswqe</div>
+                <div class="tip"></div>
                 <div class="controls">
                     <a class="btn" id="nextBtn" href="{{ route('round1') }}" aria-label="Next question">Next</a>
                 </div>
@@ -395,7 +433,63 @@
             ctx.fillRect(-w/2, -h/2, w, h);
             ctx.restore();
         }
+
+        /* Roster persistence */
+        const rosterKeyPrefix = 'tt_roster_slot_';
+        function loadRoster(){
+            for(let i=1;i<=10;i++){
+                const input = document.querySelector(`input[data-roster-slot="${i}"]`);
+                if(!input) continue;
+                const saved = localStorage.getItem(rosterKeyPrefix + i) || '';
+                input.value = saved;
+            }
+        }
+        function saveRoster(slot, value){
+            try { localStorage.setItem(rosterKeyPrefix + slot, value); } catch(e) {}
+        }
+        function initRoster(){
+            const rosterPanel = document.getElementById('rosterPanel');
+            const rosterToggle = document.getElementById('rosterToggle');
+            if(!rosterPanel || !rosterToggle) return;
+            loadRoster();
+            rosterToggle.addEventListener('click', ()=>{
+                const nowCollapsed = rosterPanel.classList.toggle('collapsed');
+                rosterPanel.setAttribute('aria-expanded', String(!nowCollapsed));
+                rosterToggle.setAttribute('aria-pressed', String(!nowCollapsed));
+            });
+        }
+        document.addEventListener('input', (e)=>{
+            if(e.target.matches('input[data-roster-slot]')){
+                saveRoster(e.target.dataset.rosterSlot, e.target.value.trim());
+            }
+        });
+        document.addEventListener('DOMContentLoaded', initRoster);
     </script>
+    <!-- Roster Panel (10 slots) -->
+    <aside id="rosterPanel" class="roster-panel collapsed" aria-label="Roster name slots" aria-expanded="false">
+        <div class="roster-header">
+            <div class="roster-title">ROSTER</div>
+            <button id="rosterToggle" type="button" class="roster-toggle" aria-pressed="false" aria-label="Toggle roster panel">⇔</button>
+        </div>
+        <div class="roster-groups">
+            <div class="team-block red" aria-labelledby="red-team-label">
+                <div id="red-team-label" class="team-label"><span class="dot" aria-hidden="true"></span> RED TEAM</div>
+                <div class="roster-list" role="list">
+                    @for($i=1;$i<=5;$i++)
+                        <input data-roster-slot="{{ $i }}" maxlength="28" placeholder="Red {{ $i }}" aria-label="Red Team slot {{ $i }}" />
+                    @endfor
+                </div>
+            </div>
+            <div class="team-block blue" aria-labelledby="blue-team-label">
+                <div id="blue-team-label" class="team-label"><span class="dot" aria-hidden="true"></span> BLUE TEAM</div>
+                <div class="roster-list" role="list">
+                    @for($i=6;$i<=10;$i++)
+                        <input data-roster-slot="{{ $i }}" maxlength="28" placeholder="Blue {{ $i-5 }}" aria-label="Blue Team slot {{ $i-5 }}" />
+                    @endfor
+                </div>
+            </div>
+        </div>
+    </aside>
     <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:5;font-family:Montserrat,system-ui,sans-serif;">
         <div style="display:flex;align-items:center;gap:10px;background:rgba(10,18,35,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:8px 14px;border:1px solid rgba(255,255,255,0.14);border-radius:999px;font-size:11px;letter-spacing:.06em;color:#b8c6e2;max-width:92vw;">
             <span style="font-weight:700;color:#57f1ff;text-transform:uppercase;font-size:10px;opacity:.85;">Thanks</span>
