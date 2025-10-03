@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 03, 2025 at 12:52 PM
+-- Generation Time: Oct 03, 2025 at 01:09 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -81,7 +81,7 @@ INSERT INTO `multiple_choice_questions` (`id`, `question`, `option_a`, `option_b
 (40, 'Clicking on a mantra modifier is supposed to lead you to the nearest', 'Blacksmith', 'Banker', 'Mantra Modifying Table', 'c', 0),
 (41, 'Which equipment piece has the talent \"Temple Guard\"', 'Evanspear Warplate', 'Ascended Outlaw Hat', 'Monastery Champion\'s Robes', 'c', 0),
 (42, 'What health percentage range do you need to be to proc shadow assault blast spark', 'Below 50%', 'Below 40%', 'Above 60%', 'b', 0),
-(43, 'What color eyes does Primadon have', 'Yellow', 'Light Blue', 'Green', 'a', 0),
+(43, 'What color eyes does Elder Primadon have?', 'Yellow', 'Light Blue', 'Green', 'a', 0),
 (44, 'How many legs does Widow have?', '8', '6', '10', 'a', 0),
 (46, 'How many working eyes do Stone Knights have?', '5', '3', '4', 'c', 0),
 (48, 'How many Crazy Slot weapons are there?', '5', '6', '7', 'b', 0),
