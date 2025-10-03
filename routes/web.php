@@ -33,6 +33,7 @@ Route::get('/round2', [QuestionController::class, 'round2'])->name('round2');
 Route::post('/round2/correct', [QuestionController::class, 'round2Correct'])->name('round2.correct');
 Route::post('/round2/wrong', [QuestionController::class, 'round2Wrong'])->name('round2.wrong');
 Route::post('/round2/skip', [QuestionController::class, 'round2Skip'])->name('round2.skip');
+Route::post('/round2/reset', [QuestionController::class, 'round2Reset'])->name('round2.reset');
 
 // Head to Head dynamic (no full page reload)
 Route::get('/head-to-head', [GameController::class, 'show'])->name('h2h.show');

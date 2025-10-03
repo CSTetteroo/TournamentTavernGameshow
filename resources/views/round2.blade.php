@@ -648,6 +648,10 @@
                             @endif
                             <button class="btn secondary" type="submit">Skip</button>
                         </form>
+                        <form method="POST" action="{{ route('round2.reset') }}" style="margin:0;" aria-label="Reset prize ladder to zero tiers">
+                            @csrf
+                            <button class="btn neutral" type="submit" title="Reset ladder to 0">Reset Ladder</button>
+                        </form>
                     </div>
                     <footer style="margin-top:12px;">
                         <div class="tip" id="footerTip">Reveal the answer to score.</div>

@@ -55,10 +55,10 @@ class QuestionController extends Controller
         return redirect()->route('round2');
     }
 
-    // Mark wrong: decrement tier count not below 0, next question
+    // Mark wrong: do NOT decrement tiers, simply proceed to next question
     public function round2Wrong(Request $request)
     {
-        $tiers = max(0, Session::get('round2_tiers', 0) - 1);
+        $tiers = Session::get('round2_tiers', 0); // unchanged
         Session::put('round2_tiers', $tiers);
         return redirect()->route('round2');
     }
@@ -72,6 +72,13 @@ class QuestionController extends Controller
             $q = Question::find($id);
             if ($q) { $q->used = 0; $q->save(); }
         }
+        return redirect()->route('round2');
+    }
+
+    // Reset Round 2 progress (tiers) back to 0
+    public function round2Reset(Request $request)
+    {
+        Session::put('round2_tiers', 0);
         return redirect()->route('round2');
     }
 }

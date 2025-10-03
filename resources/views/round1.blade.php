@@ -246,6 +246,11 @@
         .collapsed .roster-title { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .2em; font-size: 10px; }
         .collapsed .roster-toggle { padding: 4px 6px; font-size: 10px; }
         @media (max-width: 900px) { .roster-panel { display: none; } }
+    /* Timer (imported from Round 2) */
+    .timer { display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+    .timer-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .timer input { width:110px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:var(--text); }
+    .time-display { font-family:'Orbitron',system-ui,sans-serif; font-weight:900; letter-spacing:.08em; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); }
     </style>
 </head>
 <body>
@@ -262,7 +267,21 @@
                         <div class="badge" aria-label="Game Show Mode">Official Deepwoken Gameshow</div>
                     </div>
                 </div>
-                <div class="badge" title="Round">Round <span id="round">1/2</span></div>
+                <div class="timer" aria-label="Countdown timer">
+                    <div class="timer-row">
+                        <span class="time-display" id="r1_time">00:00</span>
+                        <input id="r1_timeInput" type="text" placeholder="mm:ss" aria-label="Set timer (mm:ss)" />
+                        <button class="btn secondary icon-btn" id="r1_setTimerBtn" type="button" aria-label="Set timer" title="Set">
+                            Set
+                        </button>
+                    </div>
+                    <div class="timer-row">
+                        <button class="btn secondary icon-btn" id="r1_pauseBtn" type="button" aria-label="Pause" title="Pause">⏸</button>
+                        <button class="btn icon-btn" id="r1_startBtn" type="button" aria-label="Start" title="Start">▶</button>
+                        <button class="btn secondary icon-btn" id="r1_resetBtn" type="button" aria-label="Reset" title="Reset">↺</button>
+                        <div class="badge" title="Round">Round <span id="round">1/2</span></div>
+                    </div>
+                </div>
             </header>
 
             <div class="question-wrap" id="questionWrap" role="button" tabindex="0" aria-expanded="false" aria-label="Reveal question">
@@ -464,6 +483,60 @@
             }
         });
         document.addEventListener('DOMContentLoaded', initRoster);
+
+        /* Round1 Timer (mirrors Round2 logic with distinct storage keys) */
+        const r1_timeEl = document.getElementById('r1_time');
+        const r1_timeInput = document.getElementById('r1_timeInput');
+        const r1_setBtn = document.getElementById('r1_setTimerBtn');
+        const r1_startBtn = document.getElementById('r1_startBtn');
+        const r1_pauseBtn = document.getElementById('r1_pauseBtn');
+        const r1_resetBtn = document.getElementById('r1_resetBtn');
+        let r1_totalSeconds = 0; // paused/remaining
+        let r1_timerId = null;
+        let r1_endTime = null; // epoch ms
+        const R1_LS_END = 'round1TimerEnd';
+        const R1_LS_REM = 'round1TimerRemain';
+
+        function r1_formatTime(s){
+            const m = Math.floor(s/60).toString().padStart(2,'0');
+            const ss = Math.floor(s%60).toString().padStart(2,'0');
+            return `${m}:${ss}`;
+        }
+        function r1_render(){ r1_timeEl.textContent = r1_formatTime(r1_totalSeconds); }
+        function r1_parse(val){
+            if(!val) return null; const parts = val.split(':'); if(parts.length!==2) return null;
+            const m = parseInt(parts[0],10), s = parseInt(parts[1],10);
+            if(Number.isNaN(m)||Number.isNaN(s)||m<0||s<0||s>=60) return null; return m*60+s;
+        }
+        function r1_computeRemaining(){ if(!r1_endTime) return r1_totalSeconds; const diff=Math.ceil((r1_endTime-Date.now())/1000); return diff>0?diff:0; }
+        let r1_lastDisplayed = null;
+        function r1_updateFromEnd(){
+            const remain = r1_computeRemaining();
+            if(remain!==r1_lastDisplayed){ r1_totalSeconds=remain; r1_render(); r1_lastDisplayed=remain; } else { r1_totalSeconds=remain; }
+            if(r1_endTime && remain===0){ r1_stop(); r1_clearPersist(); }
+        }
+        function r1_tick(){ r1_updateFromEnd(); }
+        function r1_start(){ if(r1_timerId || r1_totalSeconds<=0) return; r1_timerId=setInterval(r1_tick,250); r1_tick(); }
+        function r1_stop(){ if(r1_timerId){ clearInterval(r1_timerId); r1_timerId=null; } }
+        function r1_clearPersist(){ localStorage.removeItem(R1_LS_END); localStorage.removeItem(R1_LS_REM); r1_endTime=null; }
+        function r1_reset(){ r1_stop(); r1_clearPersist(); r1_totalSeconds=0; r1_render(); }
+        function r1_setNew(seconds){ r1_stop(); r1_clearPersist(); if(seconds<=0){ r1_reset(); return;} r1_totalSeconds=seconds; r1_render(); localStorage.setItem(R1_LS_REM, String(r1_totalSeconds)); }
+
+        r1_setBtn?.addEventListener('click', ()=>{ const v=r1_parse(r1_timeInput.value); if(v==null){ alert('Enter mm:ss (e.g., 01:30)'); return;} r1_setNew(v); });
+        r1_startBtn?.addEventListener('click', ()=>{
+            if(!r1_endTime && r1_totalSeconds===0 && r1_timeInput.value){ const v=r1_parse(r1_timeInput.value); if(v!=null) r1_setNew(v); }
+            if(r1_totalSeconds>0 && !r1_endTime){ r1_endTime=Date.now()+r1_totalSeconds*1000; localStorage.setItem(R1_LS_END, String(r1_endTime)); localStorage.removeItem(R1_LS_REM); r1_updateFromEnd(); r1_start(); }
+        });
+        r1_pauseBtn?.addEventListener('click', ()=>{ if(r1_endTime){ r1_updateFromEnd(); r1_stop(); localStorage.setItem(R1_LS_REM, String(r1_totalSeconds)); localStorage.removeItem(R1_LS_END); r1_endTime=null; } });
+        r1_resetBtn?.addEventListener('click', r1_reset);
+
+        (function r1_restore(){
+            const runningTs = localStorage.getItem(R1_LS_END);
+            const pausedRemain = localStorage.getItem(R1_LS_REM);
+            if(runningTs){ const ts=parseInt(runningTs,10); if(!Number.isNaN(ts) && ts>Date.now()){ r1_endTime=ts; r1_updateFromEnd(); r1_start(); return; } else { r1_clearPersist(); } }
+            if(pausedRemain){ const rem=parseInt(pausedRemain,10); if(!Number.isNaN(rem) && rem>0){ r1_totalSeconds=rem; } }
+            r1_render();
+        })();
     </script>
     <!-- Roster Panel (10 slots) -->
     <aside id="rosterPanel" class="roster-panel collapsed" aria-label="Roster name slots" aria-expanded="false">
