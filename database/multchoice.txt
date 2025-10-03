@@ -145,3 +145,67 @@ COMMIT;
 -- - Obvious typos fixed (e.g., ASSALT -> ASSAULT, Monestary -> Monastery, etc.).
 -- - Discord meta lines and non-conforming items (no A/B/C) were omitted.
 -- - Text uses utf8mb4 for full Unicode support.
+
+-- Additional questions appended 2025-10-03
+BEGIN;
+
+INSERT INTO `multiple_choice_questions` (`question`, `option_a`, `option_b`, `option_c`, `correct`) VALUES
+-- 62
+('What is Warmonger''s talent called?', 'Pugnacious', 'Warlord', 'True Soldier', 'a'),
+-- 63
+('What''s the old Whistling Periapt name?', 'Unstable Pendant', 'Wind Amulet', 'Ishamon''s Necklace', 'b'),
+-- 64
+('What is Nuttoon''s main slot called?', 'Stag Acrosses', 'Stag Abcrossus', 'Stag Acrossus', 'c'),
+-- 65
+('What is a Twinblade''s Spinecutter talent called?', 'Turning of the Wheel', 'Bone Cutter', 'Face Cutter', 'c'),
+-- 66
+('Find which bell pip combo doesn''t exist:', 'Blood Scourge: Throw, Size', 'Sacred Field: Sanity, Elemental, Physical Resistances', 'Teleportation: Cooldown, Speed, Waypoints', 'c'),
+-- 67
+('What talent makes your Graceful Flame burn in the Depths?', 'Flame of Denial', 'Dying Flame', 'Undying Flame', 'c'),
+-- 68
+('What Surge talent converts your Surge stacks into Ether?', 'Human Battery', 'Fried Circuits', 'Living Battery', 'a'),
+-- 69
+('For what oath obtainment do you have to speak to the NPC Cerulian?', 'Jetstriker', 'Oathless', 'Chainwarden', 'b'),
+-- 70
+('What is the price of a Megurger at Lance Leshi''s Restaurant?', '15', '20', '25', 'a'),
+-- 71
+('What is the base damage of the starter sword?', '20', '18', '16', 'b'),
+-- 72
+('Which direction does the loading icon spin on the Deepwoken menu?', 'It doesn''t', 'Counter-Clockwise', 'Clockwise', 'c'),
+-- 73
+('What weapon does Polis polish at his resting spot?', 'Shattered Katana', 'Darksteel Greatsword', 'Anklets of Alsin', 'b'),
+-- 74
+('What text appears when obtaining a Jetstriker Orb?', 'I feel the ancients rush past me...', 'I feel the winds rush through my body...', 'I must seek out more to further my training...', 'b'),
+-- 75
+('What is the race of the chef "Chef Odiolavoro"?', 'Felinor', 'Etrean', 'Gremor', 'a'),
+-- 76
+('Which one of these weapons has the slowest swing speed?', 'Quartzone Pickaxe', 'Messer', 'Formless Shard', 'b'),
+-- 77
+('What are the equip requirements for the chef weapons?', '70 WPN, 15 INT', '75 WPN, 15 CHA', '70 WPN, 15 CHA, 15 INT', 'c'),
+-- 78
+('Which food does NOT exist?', 'Heavy Steak', 'Pufferfish Stew', 'Crab Pizza', 'b'),
+-- 79
+('What was the original default TP location after speaking to Voidmother for the first time?', 'Songseeker', 'Lower Erisia', 'The Shores of Etris', 'a'),
+-- 80
+('What is Fadetrimmer''s Barber Skillset Hair Spray healing?', '10% healing, percent based healing', '50 flat HP healing', '25 flat HP healing', 'a'),
+-- 81
+('What is the NPC named for the quest dubbed "Mantra quest"?', 'Calsius', 'Kelsieus', 'Kelsius', 'c'),
+-- 82
+('Which is NOT an existing aspect/subrace?', 'Auroran', 'Aberrant Capra', 'Elder Vesperian', 'c'),
+-- 83
+('What is the name of the person you need to avenge for Arthur''s Megalodaunt Slayer quest?', 'Amara', 'Maria', 'Ivory', 'b'),
+-- 84
+('Which one of these is not a real Deepwoken book?', 'The Interrogation of Ranger Santiago Talo', 'Ossuary Maintenance', 'Operation ''Contractor''', 'c'),
+-- 85
+('How many Aces are awarded by completing Elykris''s Ministry book quest at Minityrsa?', '3', '5', '6', 'a'),
+-- 86
+('What does Duke Ishamon Erisia''s bell do?', 'Summons Prime Golems', 'Activates his parry shield', 'Summons & controls his subordinate NPCs', 'a'),
+-- 87
+('"Perpetual Distillery" is a talent from which oath?', 'Visionshaper', 'Fadetrimmer', 'Saltchemist', 'c'),
+-- 88
+('Which emote doesn''t come from a gamepass?', 'Griddy', 'Caramell', 'Headbang', 'c'),
+-- 89
+('Which of these attacks does the most damage on light weapons (no talents)?', 'Running Attack', 'Aerial', 'Uppercut', 'c');
+
+COMMIT;
+

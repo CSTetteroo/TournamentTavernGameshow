@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS qa_pairs (
 -- Insert all Q&A pairs
 INSERT INTO qa_pairs (question, answer) VALUES
 ('What is the name of the Bat race in Deepwoken?', 'Kiron'),
-('What''s dawnwalkers'' talent which empower your strikes with pure light.', 'luminous flash'),
+('What''s dawnwalkers'' talent which empowers your strikes with pure light.', 'luminous flash'),
 ('What level do you stop escaping the depths for free', 'Power 3'),
 ('Volu unlocks which legendary weapon by giving him three tomes?', 'Bloodfouler'),
 ('What was the name of the secret cave near summer isle that now is gone?', 'The hidden grove'),
@@ -150,4 +150,21 @@ INSERT INTO qa_pairs (question, answer) VALUES
 ('True or False: Visionshaper once had a Willpower requirement?', 'True'),
 ('Which oath has this oathbreak dialogue from Yun''shul?: "Was this not the future we sought? Perhaps not."', 'Bladeharper'),
 ('What was the name of Deepwokens first April Fools Event?', 'Mudwoken'),
-('What is the name of Aelita''s brother?', 'Tillian');
+('What is the name of Aelita''s brother?', 'Tillian'),
+('What''s the crafting recipe for candles?', '1 Fiber, 1 Beeswax'),
+('What 2 players have the spec "Moon Blades"?', 'Supaa and Valekis'),
+('Where is the NPC Marcus found?', 'The Hidden Village'),
+('How many notes does one item from the Meat Lord cost?', '2'),
+('What stat is unbound at The Birdcage?', 'Intelligence'),
+('Which advanced talent is unlocked from having all of the "Immolator" talents?', 'Phoenix Flames'),
+('What color of Capra race gives the talent "Mark of Jurik"?', 'Blue'),
+('Trigi is a last name of which race?', 'Vesperian'),
+('"The 72 Seasons" is a location from what event?', 'The Metallica crossover event'),
+('Gold bars can be crafted at a campfire utilizing what item?', 'Gold Rings'),
+('Drakkards can passively train their stats through the use of what talent?', 'Teachings of the Edenkite'),
+('The "Aazel''s Horns" head accessory are a reference to what game?', 'Rogue Lineage'),
+('The Teleportation Resonance was once often referred to by what community-given name?', 'Flying Raijin / Gate / Fast Travel'),
+('"Conjure a protective energy that will guide those fallen in battle towards you." is a description belonging to what ability?', 'Preservation'),
+('"The conditions have been fulfilled, they are to leave unscathed." is said by which voice of the Depths Trials?', 'Voice of Authority'),
+('What is the name of the winning weapon from the 2023 Weapon Art Concept competition, still yet to be added?', 'Bloodsworn Effigy'),
+('The family controlling The Floating Keep go by what name?', 'Spellhardt / Spellhardt Family');
