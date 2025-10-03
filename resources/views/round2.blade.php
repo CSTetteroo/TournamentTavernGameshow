@@ -998,29 +998,53 @@
             ctx.restore();
         }
 
-        /* Mini roster persistence (5 players with points) */
-        const rosterKeyName = i => `r2_player_${i}_name`;
-        const rosterKeyPts = i => `r2_player_${i}_pts`;
+        /* Mini roster persistence (5 players) - unified shared keys */
+        const SHARED_NAME = i => `roster_player_${i}_name`;
+        const SHARED_PTS  = i => `roster_player_${i}_pts`;
+        // Legacy key patterns to migrate once (round2 + potential head_to_head earlier)
+        const LEGACY_KEY_SETS = [
+            { name: i => `r2_player_${i}_name`, pts: i => `r2_player_${i}_pts` },
+            { name: i => `h2h_player_${i}_name`, pts: i => `h2h_player_${i}_pts` }
+        ];
+        function migrateLegacy(){
+            for(let i=1;i<=5;i++){
+                const sharedNameKey = SHARED_NAME(i);
+                const sharedPtsKey  = SHARED_PTS(i);
+                if(!localStorage.getItem(sharedNameKey)){ // only migrate if empty
+                    for(const set of LEGACY_KEY_SETS){
+                        const legacyVal = localStorage.getItem(set.name(i));
+                        if(legacyVal){ localStorage.setItem(sharedNameKey, legacyVal); break; }
+                    }
+                }
+                if(!localStorage.getItem(sharedPtsKey)){
+                    for(const set of LEGACY_KEY_SETS){
+                        const legacyVal = localStorage.getItem(set.pts(i));
+                        if(legacyVal){ localStorage.setItem(sharedPtsKey, legacyVal); break; }
+                    }
+                }
+            }
+        }
         function loadMiniRoster(){
             for(let i=1;i<=5;i++){
                 const nameInput = document.querySelector(`input[data-r2-name="${i}"]`);
                 const ptsInput = document.querySelector(`input[data-r2-pts="${i}"]`);
-                if(nameInput){ nameInput.value = localStorage.getItem(rosterKeyName(i)) || ''; }
-                if(ptsInput){ ptsInput.value = localStorage.getItem(rosterKeyPts(i)) || ''; }
+                if(nameInput){ nameInput.value = localStorage.getItem(SHARED_NAME(i)) || ''; }
+                if(ptsInput){ ptsInput.value = localStorage.getItem(SHARED_PTS(i)) || ''; }
             }
         }
         function saveMiniRoster(ev){
             const t = ev.target;
             if(t.matches('input[data-r2-name]')){
-                const slot = t.dataset.r2Name; localStorage.setItem(rosterKeyName(slot), t.value.trim());
+                const slot = t.dataset.r2Name; localStorage.setItem(SHARED_NAME(slot), t.value.trim());
             } else if(t.matches('input[data-r2-pts]')){
-                const slot = t.dataset.r2Pts; localStorage.setItem(rosterKeyPts(slot), t.value.trim());
+                const slot = t.dataset.r2Pts; localStorage.setItem(SHARED_PTS(slot), t.value.trim());
             }
         }
         function initMiniRoster(){
             const panel = document.getElementById('miniRoster');
             const toggle = document.getElementById('miniRosterToggle');
             if(!panel || !toggle) return;
+            migrateLegacy();
             loadMiniRoster();
             toggle.addEventListener('click', ()=>{
                 const collapsed = panel.classList.toggle('collapsed');
