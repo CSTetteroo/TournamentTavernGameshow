@@ -654,7 +654,7 @@
                         </form>
                     </div>
                     <footer style="margin-top:12px;">
-                        <div class="tip" id="footerTip">Reveal the answer to score.</div>
+                        <div class="tip">Check the stage VC chat for an explanation for the current round!</div>
                     </footer>
                 </div>
 

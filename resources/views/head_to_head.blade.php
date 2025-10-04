@@ -453,14 +453,35 @@
         }
 
         .answer-entry select {
-            background: linear-gradient(145deg, #1b2b54, #142041);
-            border: 1px solid var(--line);
-            color: var(--text);
+            /* Force custom theming (some browsers keep default white) */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: linear-gradient(145deg, #1e2f5b, #162547) !important; /* align with .btn.alt gradient */
+            background-color: #1e2f5b !important; /* fallback */
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            color: var(--text) !important;
             padding: 10px 12px;
             border-radius: 10px;
             font: 600 14px Montserrat, sans-serif;
             min-width: 90px;
             cursor: pointer;
+            transition: border-color .25s, box-shadow .25s, background .35s;
+            line-height: 1.15;
+            box-shadow: 0 2px 6px -2px rgba(0,0,0,.55) inset, 0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        /* Custom dropdown arrow */
+        .answer-entry select:after { content:""; }
+        .answer-entry select::-ms-expand { display: none; }
+        .answer-entry select option { background:#162547; color: var(--text); }
+        .answer-entry select:hover:not(:disabled) {
+            background: linear-gradient(145deg, #233662, #1a294d);
+        }
+        .answer-entry select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent), 0 4px 14px -4px rgba(0,230,255,0.45);
         }
 
         .answer-entry button.submit-answers {
@@ -482,6 +503,33 @@
             cursor: not-allowed;
         }
 
+        .answer-entry button.trigger-timer {
+            background: linear-gradient(145deg, #1e2f5b, #162547); /* match Reset Round (.btn.alt) */
+            color: var(--text);
+            font: 800 12px/1 Montserrat, sans-serif;
+            padding: 12px 18px;
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 14px;
+            letter-spacing: .08em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            transition: .25s;
+            box-shadow: 0 6px 16px -6px rgba(0,0,0,.55);
+        }
+        .answer-entry button.trigger-timer:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -6px rgba(0,0,0,.6);
+            filter: brightness(1.05);
+        }
+        .answer-entry button.trigger-timer:disabled { opacity:.5; cursor:not-allowed; }
+        .answer-entry .countdown { font-size:18px; font-weight:800; font-family:Orbitron,Montserrat,sans-serif; letter-spacing:.06em; min-width:44px; text-align:center; color:var(--danger); }
+        .answer-entry .countdown.warning { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.15); filter:brightness(1.4); } }
+
         .answer-entry small {
             font-size: 11px;
             color: var(--muted);
@@ -492,6 +540,8 @@
             background: linear-gradient(90deg, transparent, var(--line), transparent);
             margin: 10px 0;
         }
+                .tip { display: flex; color: #b3c5ff; opacity: .9; font-size: 14px; align-items: center; }
+
 
         /* Prize ladder (mirrors round2 minimal subset) now separate side box */
     .question-layout { display:flex; align-items:stretch; gap:12px; }
@@ -567,6 +617,7 @@
                             <option value="a">A</option>
                             <option value="b">B</option>
                             <option value="c">C</option>
+                            <option value="dna">DNA</option>
                         </select>
                         <label for="chaserSelect">Chaser</label>
                         <select id="chaserSelect" aria-label="Chaser answer">
@@ -574,7 +625,10 @@
                             <option value="a">A</option>
                             <option value="b">B</option>
                             <option value="c">C</option>
+                            <option value="dna">DNA</option>
                         </select>
+                        <button class="trigger-timer" id="startCountdown" type="button" title="Start 10s response window">Somebody Answered</button>
+                        <span class="countdown" id="countdownDisplay" aria-live="polite" style="display:none;">10</span>
                         <button class="submit-answers" id="submitBoth" disabled type="button">Lock Answers</button>
                         <small>(Select both answers & lock)</small>
                     </div>
@@ -582,6 +636,8 @@
                     <div class="actions">
                         <button class="btn" id="nextQuestionBtn" type="button" style="display:none;">Next Question</button>
                         <button class="btn alt" id="resetBtn" type="button">Reset Round</button>
+                        <div class="tip">Check the stage VC chat for an explanation for the current round!</div>
+
                     </div>
                 </div>
                 <div id="endActions" class="actions" style="display:none;">
@@ -631,6 +687,10 @@
 
         let locked = false;
         let lastRenderBoard = null;
+    let countdownTimer = null;
+    let countdownRemaining = 10;
+    const startCountdownBtn = document.getElementById('startCountdown');
+    const countdownDisplay = document.getElementById('countdownDisplay');
 
         function buildBoard(board, animate = true) {
             const {
@@ -749,8 +809,8 @@
             optionsEl.querySelectorAll('button').forEach(b => {
                 const c = b.dataset.choice;
                 if (c === correct) b.classList.add('correct');
-                if (c === playerChosen && c !== correct) b.classList.add('wrong');
-                if (c === last.chaserAnswer && c !== correct) b.classList.add('wrong');
+                if (c === playerChosen && c !== correct && playerChosen !== 'dna') b.classList.add('wrong');
+                if (c === last.chaserAnswer && c !== correct && last.chaserAnswer !== 'dna') b.classList.add('wrong');
             });
         }
 
@@ -777,6 +837,7 @@
                     // reset selects
                     playerSelect.value = '';
                     chaserSelect.value = '';
+                    resetCountdown();
                     updateSubmitState();
                     nextBtn.style.display = 'none';
                     optionsEl.querySelectorAll('button').forEach(b => {
@@ -803,6 +864,7 @@
             if (playerSelect.value && chaserSelect.value) {
                 submitBothAnswers(playerSelect.value, chaserSelect.value);
             }
+            stopCountdown();
             updateSubmitState();
         });
 
@@ -818,6 +880,7 @@
                     });
                     const data = await r.json();
                     render(data, false);
+                    stopCountdown();
                 } catch (e) {
                     console.error(e);
                 }
@@ -840,6 +903,7 @@
                 console.error(e);
             } finally {
                 locked = false;
+                stopCountdown();
             }
         }
 
@@ -869,12 +933,42 @@
                 });
                 const data = await r.json();
                 render(data, false);
+                stopCountdown();
             } catch (e) {
                 console.error(e);
             } finally {
                 updatePositionsBtn.disabled = false;
             }
         });
+
+        // Countdown logic
+        function startCountdown(){
+            if(countdownTimer) return; // already running
+            countdownRemaining = 10;
+            countdownDisplay.textContent = countdownRemaining;
+            countdownDisplay.style.display = 'inline-block';
+            countdownDisplay.classList.remove('warning');
+            startCountdownBtn.disabled = true;
+            countdownTimer = setInterval(()=>{
+                countdownRemaining--;
+                if(countdownRemaining <= 3){ countdownDisplay.classList.add('warning'); }
+                if(countdownRemaining <= 0){
+                    countdownDisplay.textContent = '0';
+                    stopCountdown();
+                    // Host can manually set DNA for missing answer; no auto action per spec.
+                    return;
+                }
+                countdownDisplay.textContent = countdownRemaining;
+            },1000);
+        }
+        function stopCountdown(){
+            if(countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+            startCountdownBtn.disabled = false;
+            countdownDisplay.style.display = 'none';
+            countdownDisplay.classList.remove('warning');
+        }
+        function resetCountdown(){ stopCountdown(); }
+        startCountdownBtn.addEventListener('click', startCountdown);
 
         /* Mini roster persistence (unified with round2) */
         const SHARED_NAME = i => `roster_player_${i}_name`;

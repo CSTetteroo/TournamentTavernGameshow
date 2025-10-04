@@ -430,6 +430,8 @@
                 width: 100%;
             }
         }
+                        .tip { color: #b3c5ff; opacity: .9; font-size: 14px; }
+
     /* Mini Roster (exact Round 2 clone) */
     .mini-roster { position: fixed; top: 50%; left: 10px; transform: translateY(-50%); width: 238px; max-height: 80vh; overflow: visible; background: rgba(10,18,35,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.14); border-radius: 18px; padding: 10px 12px 12px; z-index: 60; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 28px -6px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05) inset; font-family: 'Montserrat', system-ui, sans-serif; }
     .mini-roster.collapsed { width: 72px; padding: 8px 10px 10px; }
@@ -564,6 +566,8 @@
                     <button class="btn danger" id="wrongBtn" type="button"
                         style="flex:1;min-width:140px;">Wrong</button>
                 </div>
+                                    <div class="tip">Check the stage VC chat for an explanation for the current round!</div>
+
                 <!-- Next button removed: auto-advance on scoring -->
             </div>
         </section>

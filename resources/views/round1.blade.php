@@ -129,7 +129,7 @@
         .question {
             margin: 6px 0 0;
             font-weight: 900;
-            font-size: clamp(28px, 4.8vw, 72px);
+            font-size: clamp(28px, 4.8vw, 46px);
             line-height: 1.05;
             text-shadow: 0 6px 22px rgba(0,0,0,.45), 0 0 22px rgba(0, 230, 255, .25);
         }
@@ -320,7 +320,7 @@
             </div>
 
             <footer>
-                <div class="tip"></div>
+                <div class="tip">YOU CAN JOIN! Check the stage VC chat for an explanation for the current round!</div>
                 <div class="controls">
                     <a class="btn" id="nextBtn" href="{{ route('round1') }}" aria-label="Next question">Next</a>
                 </div>

@@ -109,8 +109,9 @@ class GameController extends Controller
     {
         // Manual dual-input answers: player & chaser each submit a choice.
         $request->validate([
-            'player_answer' => 'required|in:a,b,c',
-            'chaser_answer' => 'required|in:a,b,c',
+            // Allow 'dna' (Did Not Answer) which always counts as incorrect
+            'player_answer' => 'required|in:a,b,c,dna',
+            'chaser_answer' => 'required|in:a,b,c,dna',
         ]);
         $board = $this->initBoard();
         $q = Session::get('h2h.current_q');
@@ -124,8 +125,9 @@ class GameController extends Controller
 
         $playerAnswer = $request->input('player_answer');
         $chaserAnswer = $request->input('chaser_answer');
-        $playerCorrect = $playerAnswer === $q->correct;
-        $chaserCorrect = $chaserAnswer === $q->correct;
+    // DNA is always incorrect regardless of correct option
+    $playerCorrect = ($playerAnswer !== 'dna') && $playerAnswer === $q->correct;
+    $chaserCorrect = ($chaserAnswer !== 'dna') && $chaserAnswer === $q->correct;
 
         if ($playerCorrect) {
             $playerPos = max(0, $playerPos - 1); // player advances toward home
