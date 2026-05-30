@@ -528,10 +528,10 @@
             }
         }
 
-        /* Round 2 mini roster (5 players with points) */
+        /* Round 2 mini roster (EU/NA tabs, 5 players each) */
         .mini-roster {
             position: fixed; top: 50%; left: 10px; transform: translateY(-50%);
-            width: 238px; max-height: 80vh; /* keep height constraint but allow internal focus rings */
+            width: 248px; max-height: 80vh; /* keep height constraint but allow internal focus rings */
             overflow: visible; /* was hidden: caused points field / focus ring clipping */
             background: rgba(10,18,35,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.14); border-radius: 18px;
@@ -545,13 +545,25 @@
         .mini-roster-title { font-size:11px; letter-spacing:.14em; font-weight:700; color:#9cd9ff; opacity:.9; }
         .mini-roster-toggle { cursor:pointer; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#9cd9ff; border-radius:8px; font-size:11px; font-weight:600; padding:4px 8px; letter-spacing:.08em; }
         .mini-roster-toggle:hover { background:rgba(255,255,255,0.14); }
-        .mini-roster-list { display:flex; flex-direction:column; gap:6px; }
-    .player-row { display:flex; align-items:center; gap:6px; }
-    .player-row input.player-name { flex:1 1 auto; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 8px 5px; font-size:12px; font-weight:600; color:#e6f2ff; outline:none; letter-spacing:.03em; transition:border-color .2s, box-shadow .2s, background .25s; }
+        .mini-roster-tabs { display:flex; gap:6px; }
+        .tab-btn {
+            cursor:pointer; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06);
+            color:#cfe4ff; border-radius:8px; font-size:10px; font-weight:700; letter-spacing:.12em;
+            padding:4px 8px; text-transform:uppercase;
+        }
+        .tab-btn.active {
+            background: linear-gradient(90deg, rgba(94,177,255,.3), rgba(94,231,255,.3));
+            color:#0b1222; border-color: rgba(94,231,255,.75);
+        }
+        .mini-roster-list { display:none; flex-direction:column; gap:6px; }
+        .mini-roster-list.active { display:flex; }
+        .player-row { display:flex; align-items:center; gap:6px; }
+        .player-row input.player-name { flex:1 1 auto; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 8px 5px; font-size:12px; font-weight:600; color:#e6f2ff; outline:none; letter-spacing:.03em; transition:border-color .2s, box-shadow .2s, background .25s; }
         .player-row input[type="text"]:focus { border-color:#57f1ff; box-shadow:0 0 0 1px #57f1ff, 0 4px 14px -4px rgba(87,241,255,0.5); background:rgba(255,255,255,0.12); }
-    .points { flex:0 0 auto; width:32px; max-width:32px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 3px 5px; font-size:11px; font-weight:700; color:#ffd166; text-align:center; outline:none; transition:border-color .2s, box-shadow .2s, background .25s; box-sizing:border-box; }
+        .points { flex:0 0 auto; width:44px; max-width:44px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 3px 5px; font-size:11px; font-weight:700; color:#ffd166; text-align:center; outline:none; transition:border-color .2s, box-shadow .2s, background .25s; box-sizing:border-box; }
         .points:focus { border-color:#ffd166; box-shadow:0 0 0 1px #ffd166, 0 4px 14px -4px rgba(255,209,102,0.45); background:rgba(255,255,255,0.12); }
         .collapsed .mini-roster-list { display:none; }
+        .collapsed .mini-roster-tabs { display:none; }
         .collapsed .mini-roster-title { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing:.2em; font-size:10px; }
         .collapsed .mini-roster-toggle { padding:4px 6px; font-size:10px; }
         @media (max-width: 1000px) { .mini-roster { display:none; } }
@@ -593,8 +605,6 @@
                                 <polygon points="7 5 19 12 7 19 7 5" />
                             </svg>
                         </button>
-                        <div class="badge" title="Round">Round <span id="round">2/2</span></div>
-
                     </div>
                 </div>
             </header>
@@ -662,20 +672,17 @@
                     <h3 style="margin-top:0;">Prize Ladder</h3>
                     @php
                         $prizes = [
-                            '5 Moonseyes',
-                            '15 Idols, 5 Moonseyes',
+                            '15,000 Notes',
+                            '25 Moonseyes',
                             'Whistling Periapt',
-                            'Obt Relic of Choice',
-                            'Obt Item of Choice',
+                            '(Obt) Relic of Choice',
+                            '(Obt) Item of Choice',
                             'Custom Name',
-                            'Name + Mantle',
-                            'Name + Title',
-                            'Name + Title + Mantle',
-                            'Name + Title + Obt item',
+                            'Custom Title',
                         ];
                         $active = isset($tiers) ? $tiers : 0;
                     @endphp
-                    @for ($i = 0; $i < 10; $i++)
+                    @for ($i = 0; $i < 7; $i++)
                         <div class="tier {{ $i < $active ? 'active' : '' }}">
                             <div>Q{{ $i + 1 }}</div>
                             <div class="prize">{{ $prizes[$i] }}</div>
@@ -686,15 +693,16 @@
         </section>
     </div>
     <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:5;font-family:Montserrat,system-ui,sans-serif;">
+    <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:5;font-family:Montserrat,system-ui,sans-serif;">
         <div style="display:flex;align-items:center;gap:10px;background:rgba(10,18,35,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:8px 14px;border:1px solid rgba(255,255,255,0.14);border-radius:999px;font-size:11px;letter-spacing:.06em;color:#b8c6e2;max-width:92vw;">
             <span style="font-weight:700;color:#57f1ff;text-transform:uppercase;font-size:10px;opacity:.85;">Thanks</span>
             <span aria-hidden="true" style="opacity:.4;">|</span>
-            <span style="white-space:nowrap;">[Questions]: Thatoneguy_o · Aswqe · Shiny · leron7 · cam2 · KOWZ · Wormcave · Sillybillycar2 · Blahamus · Equal_dark</span>
+            <span style="white-space:nowrap;">[Questions]: Thatoneguy_o · Aswqe · KitKat · Shiny · leron7 · Ki11er · Lucianz · cam2 · KOWZ · Wormcave · Sillybillycar2 · Blahamus · Equal_dark</span>
             <span aria-hidden="true" style="opacity:.4;">|</span>
             <span style="white-space:nowrap;">[Website]: · Onteal</span>
             <span aria-hidden="true" style="opacity:.4;">|</span>
-            <span style="white-space:nowrap;">[Chaser Profile Picture]: · V1kov</span>
         </div>
+    </div>
     </div>
 
     <script>
@@ -1002,47 +1010,73 @@
             ctx.restore();
         }
 
-        /* Mini roster persistence (5 players) - unified shared keys */
-        const SHARED_NAME = i => `roster_player_${i}_name`;
-        const SHARED_PTS  = i => `roster_player_${i}_pts`;
+        /* Mini roster persistence (EU/NA tabs) - unified shared keys */
+        const ROSTER_REGIONS = ['eu', 'na'];
+        const ROSTER_NAME = (region, i) => `roster_${region}_player_${i}_name`;
+        const ROSTER_PTS = (region, i) => `roster_${region}_player_${i}_pts`;
+        const LS_KEY_REGION = 'roster_active_region';
         // Legacy key patterns to migrate once (round2 + potential head_to_head earlier)
         const LEGACY_KEY_SETS = [
+            { name: i => `roster_player_${i}_name`, pts: i => `roster_player_${i}_pts` },
             { name: i => `r2_player_${i}_name`, pts: i => `r2_player_${i}_pts` },
             { name: i => `h2h_player_${i}_name`, pts: i => `h2h_player_${i}_pts` }
         ];
         function migrateLegacy(){
             for(let i=1;i<=5;i++){
-                const sharedNameKey = SHARED_NAME(i);
-                const sharedPtsKey  = SHARED_PTS(i);
-                if(!localStorage.getItem(sharedNameKey)){ // only migrate if empty
-                    for(const set of LEGACY_KEY_SETS){
-                        const legacyVal = localStorage.getItem(set.name(i));
-                        if(legacyVal){ localStorage.setItem(sharedNameKey, legacyVal); break; }
+                let legacyName = '';
+                let legacyPts = '';
+                for(const set of LEGACY_KEY_SETS){
+                    legacyName = legacyName || localStorage.getItem(set.name(i)) || '';
+                    legacyPts = legacyPts || localStorage.getItem(set.pts(i)) || '';
+                }
+                if(legacyName){
+                    for(const region of ROSTER_REGIONS){
+                        const key = ROSTER_NAME(region, i);
+                        if(!localStorage.getItem(key)) localStorage.setItem(key, legacyName);
                     }
                 }
-                if(!localStorage.getItem(sharedPtsKey)){
-                    for(const set of LEGACY_KEY_SETS){
-                        const legacyVal = localStorage.getItem(set.pts(i));
-                        if(legacyVal){ localStorage.setItem(sharedPtsKey, legacyVal); break; }
+                if(legacyPts){
+                    for(const region of ROSTER_REGIONS){
+                        const key = ROSTER_PTS(region, i);
+                        if(!localStorage.getItem(key)) localStorage.setItem(key, legacyPts);
                     }
                 }
             }
         }
         function loadMiniRoster(){
-            for(let i=1;i<=5;i++){
-                const nameInput = document.querySelector(`input[data-r2-name="${i}"]`);
-                const ptsInput = document.querySelector(`input[data-r2-pts="${i}"]`);
-                if(nameInput){ nameInput.value = localStorage.getItem(SHARED_NAME(i)) || ''; }
-                if(ptsInput){ ptsInput.value = localStorage.getItem(SHARED_PTS(i)) || ''; }
-            }
+            document.querySelectorAll('input[data-roster-name]').forEach(input => {
+                const region = input.dataset.rosterRegion;
+                const slot = input.dataset.rosterName;
+                input.value = localStorage.getItem(ROSTER_NAME(region, slot)) || '';
+            });
+            document.querySelectorAll('input[data-roster-pts]').forEach(input => {
+                const region = input.dataset.rosterRegion;
+                const slot = input.dataset.rosterPts;
+                input.value = localStorage.getItem(ROSTER_PTS(region, slot)) || '';
+            });
         }
         function saveMiniRoster(ev){
             const t = ev.target;
-            if(t.matches('input[data-r2-name]')){
-                const slot = t.dataset.r2Name; localStorage.setItem(SHARED_NAME(slot), t.value.trim());
-            } else if(t.matches('input[data-r2-pts]')){
-                const slot = t.dataset.r2Pts; localStorage.setItem(SHARED_PTS(slot), t.value.trim());
+            if(t.matches('input[data-roster-name]')){
+                const region = t.dataset.rosterRegion;
+                const slot = t.dataset.rosterName;
+                localStorage.setItem(ROSTER_NAME(region, slot), t.value.trim());
+            } else if(t.matches('input[data-roster-pts]')){
+                const region = t.dataset.rosterRegion;
+                const slot = t.dataset.rosterPts;
+                localStorage.setItem(ROSTER_PTS(region, slot), t.value.trim());
             }
+        }
+        function setActiveRegion(region){
+            const lists = document.querySelectorAll('.mini-roster-list[data-region]');
+            const buttons = document.querySelectorAll('[data-roster-tab]');
+            lists.forEach(list => list.classList.toggle('active', list.dataset.region === region));
+            buttons.forEach(btn => {
+                const isActive = btn.dataset.rosterTab === region;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', String(isActive));
+            });
+            localStorage.setItem(LS_KEY_REGION, region);
         }
         function initMiniRoster(){
             const panel = document.getElementById('miniRoster');
@@ -1050,26 +1084,43 @@
             if(!panel || !toggle) return;
             migrateLegacy();
             loadMiniRoster();
+            const region = localStorage.getItem(LS_KEY_REGION) || 'eu';
+            setActiveRegion(region);
             toggle.addEventListener('click', ()=>{
                 const collapsed = panel.classList.toggle('collapsed');
                 panel.setAttribute('aria-expanded', String(!collapsed));
                 toggle.setAttribute('aria-pressed', String(!collapsed));
             });
+            document.querySelectorAll('[data-roster-tab]').forEach(btn => {
+                btn.addEventListener('click', () => setActiveRegion(btn.dataset.rosterTab));
+            });
             document.addEventListener('input', saveMiniRoster);
         }
         document.addEventListener('DOMContentLoaded', initMiniRoster);
     </script>
-    <!-- Mini Roster (5 players with points) -->
+    <!-- Mini Roster (EU/NA tabs) -->
     <aside id="miniRoster" class="mini-roster collapsed" aria-label="Round 2 roster" aria-expanded="false">
         <div class="mini-roster-header">
             <div class="mini-roster-title">PLAYERS</div>
             <button id="miniRosterToggle" type="button" class="mini-roster-toggle" aria-pressed="false" aria-label="Toggle players panel">⇔</button>
         </div>
-        <div class="mini-roster-list" role="list">
+        <div class="mini-roster-tabs" role="tablist" aria-label="Roster region">
+            <button type="button" class="tab-btn" data-roster-tab="eu" role="tab" aria-selected="false">EU</button>
+            <button type="button" class="tab-btn" data-roster-tab="na" role="tab" aria-selected="false">NA</button>
+        </div>
+        <div class="mini-roster-list" data-region="eu" role="list" aria-label="EU players">
             @for($i=1;$i<=5;$i++)
             <div class="player-row" role="listitem">
-                <input type="text" class="player-name" data-r2-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="Player {{ $i }} name" />
-                <input type="text" data-r2-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="Player {{ $i }} points" />
+                <input type="text" class="player-name" data-roster-region="eu" data-roster-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="EU Player {{ $i }} name" />
+                <input type="text" data-roster-region="eu" data-roster-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="EU Player {{ $i }} points" />
+            </div>
+            @endfor
+        </div>
+        <div class="mini-roster-list" data-region="na" role="list" aria-label="NA players">
+            @for($i=1;$i<=5;$i++)
+            <div class="player-row" role="listitem">
+                <input type="text" class="player-name" data-roster-region="na" data-roster-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="NA Player {{ $i }} name" />
+                <input type="text" data-roster-region="na" data-roster-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="NA Player {{ $i }} points" />
             </div>
             @endfor
         </div>

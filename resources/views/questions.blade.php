@@ -46,6 +46,9 @@
         .muted{ color:var(--muted); }
         .empty{ text-align:center; padding: 24px; color: var(--muted); }
         .pill{ display:inline-block; min-width: 36px; text-align:center; padding:4px 8px; border-radius:8px; font-weight:800; font-size:12px; background: rgba(255,255,255,.08); border:1px solid var(--line); }
+        .pill.d1{ color:#9ff2b6; border-color: rgba(159,242,182,.35); background: rgba(159,242,182,.08); }
+        .pill.d2{ color:#ffd166; border-color: rgba(255,209,102,.35); background: rgba(255,209,102,.08); }
+        .pill.d3{ color:#ff8aa0; border-color: rgba(255,138,160,.35); background: rgba(255,138,160,.08); }
 
         @media (max-width: 720px) {
             thead th:nth-child(1), tbody td:nth-child(1) { width: 70px; }
@@ -86,6 +89,7 @@
                     <th style="width:90px;">ID</th>
                     <th>Question</th>
                     <th style="width:50%;">Answer</th>
+                    <th style="width:110px;">Difficulty</th>
                     <th style="width:40px;">Used</th>
                 </tr>
             </thead>
@@ -97,10 +101,17 @@
                         <div class="q">{{ $q->question }}</div>
                     </td>
                     <td data-col="answer">{{ $q->answer }}</td>
+                    @php
+                        $d = $q->difficulty ?? null;
+                        $dLabel = $d == 1 ? 'Easy' : ($d == 2 ? 'Medium' : ($d == 3 ? 'Hard' : '-'));
+                    @endphp
+                    <td>
+                        <span class="pill d{{ $d }}">{{ $dLabel }}</span>
+                    </td>
                     <td>{{ $q->used ? '✅' : '' }}</td>
                 </tr>
             @empty
-                <tr><td class="empty" colspan="3">No questions yet.</td></tr>
+                <tr><td class="empty" colspan="5">No questions yet.</td></tr>
             @endforelse
             </tbody>
         </table>
@@ -122,7 +133,8 @@
             const id = norm(row.cells[0]?.innerText);
             const question = norm(row.cells[1]?.innerText);
             const answer = norm(row.cells[2]?.innerText);
-            const match = !q || id.includes(q) || question.includes(q) || answer.includes(q);
+            const difficulty = norm(row.cells[3]?.innerText);
+            const match = !q || id.includes(q) || question.includes(q) || answer.includes(q) || difficulty.includes(q);
             row.style.display = match ? '' : 'none';
         }
     });

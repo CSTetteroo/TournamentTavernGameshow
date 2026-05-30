@@ -561,20 +561,25 @@
             .prize-ladder { width:100%; }
         }
 
-        /* Mini roster (shared style with round2) */
-        .mini-roster { position: fixed; top: 50%; left: 10px; transform: translateY(-50%); width: 238px; max-height: 80vh; overflow: visible; background: rgba(10,18,35,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.14); border-radius: 18px; padding: 10px 12px 12px; z-index: 60; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 28px -6px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05) inset; font-family: 'Montserrat', system-ui, sans-serif; }
+        /* Mini roster (EU/NA tabs) */
+        .mini-roster { position: fixed; top: 50%; left: 10px; transform: translateY(-50%); width: 248px; max-height: 80vh; overflow: visible; background: rgba(10,18,35,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.14); border-radius: 18px; padding: 10px 12px 12px; z-index: 60; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 28px -6px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05) inset; font-family: 'Montserrat', system-ui, sans-serif; }
         .mini-roster.collapsed { width: 72px; padding: 8px 10px 10px; }
         .mini-roster-header { display:flex; align-items:center; justify-content:space-between; gap:6px; }
         .mini-roster-title { font-size:11px; letter-spacing:.14em; font-weight:700; color:#9cd9ff; opacity:.9; }
         .mini-roster-toggle { cursor:pointer; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#9cd9ff; border-radius:8px; font-size:11px; font-weight:600; padding:4px 8px; letter-spacing:.08em; }
         .mini-roster-toggle:hover { background:rgba(255,255,255,0.14); }
-        .mini-roster-list { display:flex; flex-direction:column; gap:6px; }
+        .mini-roster-tabs { display:flex; gap:6px; }
+        .tab-btn { cursor:pointer; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06); color:#cfe4ff; border-radius:8px; font-size:10px; font-weight:700; letter-spacing:.12em; padding:4px 8px; text-transform:uppercase; }
+        .tab-btn.active { background: linear-gradient(90deg, rgba(94,177,255,.3), rgba(94,231,255,.3)); color:#0b1222; border-color: rgba(94,231,255,.75); }
+        .mini-roster-list { display:none; flex-direction:column; gap:6px; }
+        .mini-roster-list.active { display:flex; }
         .player-row { display:flex; align-items:center; gap:6px; }
         .player-row input.player-name { flex:1 1 auto; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 8px 5px; font-size:12px; font-weight:600; color:#e6f2ff; outline:none; letter-spacing:.03em; transition:border-color .2s, box-shadow .2s, background .25s; }
         .player-row input.player-name:focus { border-color:#57f1ff; box-shadow:0 0 0 1px #57f1ff, 0 4px 14px -4px rgba(87,241,255,0.5); background:rgba(255,255,255,0.12); }
-        .points { flex:0 0 auto; width:32px; max-width:32px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 3px 5px; font-size:11px; font-weight:700; color:#ffd166; text-align:center; outline:none; transition:border-color .2s, box-shadow .2s, background .25s; box-sizing:border-box; }
+        .points { flex:0 0 auto; width:44px; max-width:44px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:4px 3px 5px; font-size:11px; font-weight:700; color:#ffd166; text-align:center; outline:none; transition:border-color .2s, box-shadow .2s, background .25s; box-sizing:border-box; }
         .points:focus { border-color:#ffd166; box-shadow:0 0 0 1px #ffd166, 0 4px 14px -4px rgba(255,209,102,0.45); background:rgba(255,255,255,0.12); }
         .collapsed .mini-roster-list { display:none; }
+        .collapsed .mini-roster-tabs { display:none; }
         .collapsed .mini-roster-title { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing:.2em; font-size:10px; }
         .collapsed .mini-roster-toggle { padding:4px 6px; font-size:10px; }
         @media (max-width: 1100px){ .mini-roster { display:none; } }
@@ -970,43 +975,72 @@
         function resetCountdown(){ stopCountdown(); }
         startCountdownBtn.addEventListener('click', startCountdown);
 
-        /* Mini roster persistence (unified with round2) */
-        const SHARED_NAME = i => `roster_player_${i}_name`;
-        const SHARED_PTS  = i => `roster_player_${i}_pts`;
+        /* Mini roster persistence (EU/NA tabs) - shared keys */
+        const ROSTER_REGIONS = ['eu', 'na'];
+        const ROSTER_NAME = (region, i) => `roster_${region}_player_${i}_name`;
+        const ROSTER_PTS = (region, i) => `roster_${region}_player_${i}_pts`;
+        const LS_KEY_REGION = 'roster_active_region';
         const LEGACY_KEY_SETS = [
+            { name: i => `roster_player_${i}_name`, pts: i => `roster_player_${i}_pts` },
             { name: i => `h2h_player_${i}_name`, pts: i => `h2h_player_${i}_pts` },
             { name: i => `r2_player_${i}_name`, pts: i => `r2_player_${i}_pts` }
         ];
         function migrateLegacy(){
             for(let i=1;i<=5;i++){
-                const sn = SHARED_NAME(i); const sp = SHARED_PTS(i);
-                if(!localStorage.getItem(sn)){
-                    for(const set of LEGACY_KEY_SETS){
-                        const v = localStorage.getItem(set.name(i)); if(v){ localStorage.setItem(sn, v); break; }
+                let legacyName = '';
+                let legacyPts = '';
+                for(const set of LEGACY_KEY_SETS){
+                    legacyName = legacyName || localStorage.getItem(set.name(i)) || '';
+                    legacyPts = legacyPts || localStorage.getItem(set.pts(i)) || '';
+                }
+                if(legacyName){
+                    for(const region of ROSTER_REGIONS){
+                        const key = ROSTER_NAME(region, i);
+                        if(!localStorage.getItem(key)) localStorage.setItem(key, legacyName);
                     }
                 }
-                if(!localStorage.getItem(sp)){
-                    for(const set of LEGACY_KEY_SETS){
-                        const v = localStorage.getItem(set.pts(i)); if(v){ localStorage.setItem(sp, v); break; }
+                if(legacyPts){
+                    for(const region of ROSTER_REGIONS){
+                        const key = ROSTER_PTS(region, i);
+                        if(!localStorage.getItem(key)) localStorage.setItem(key, legacyPts);
                     }
                 }
             }
         }
         function loadMiniRoster(){
-            for(let i=1;i<=5;i++){
-                const nameInput = document.querySelector(`input[data-h2h-name="${i}"]`);
-                const ptsInput = document.querySelector(`input[data-h2h-pts="${i}"]`);
-                if(nameInput){ nameInput.value = localStorage.getItem(SHARED_NAME(i)) || ''; }
-                if(ptsInput){ ptsInput.value = localStorage.getItem(SHARED_PTS(i)) || ''; }
-            }
+            document.querySelectorAll('input[data-roster-name]').forEach(input => {
+                const region = input.dataset.rosterRegion;
+                const slot = input.dataset.rosterName;
+                input.value = localStorage.getItem(ROSTER_NAME(region, slot)) || '';
+            });
+            document.querySelectorAll('input[data-roster-pts]').forEach(input => {
+                const region = input.dataset.rosterRegion;
+                const slot = input.dataset.rosterPts;
+                input.value = localStorage.getItem(ROSTER_PTS(region, slot)) || '';
+            });
         }
         function saveMiniRoster(ev){
             const t = ev.target;
-            if(t.matches('input[data-h2h-name]')){
-                const slot = t.dataset.h2hName; localStorage.setItem(SHARED_NAME(slot), t.value.trim());
-            } else if(t.matches('input[data-h2h-pts]')){
-                const slot = t.dataset.h2hPts; localStorage.setItem(SHARED_PTS(slot), t.value.trim());
+            if(t.matches('input[data-roster-name]')){
+                const region = t.dataset.rosterRegion;
+                const slot = t.dataset.rosterName;
+                localStorage.setItem(ROSTER_NAME(region, slot), t.value.trim());
+            } else if(t.matches('input[data-roster-pts]')){
+                const region = t.dataset.rosterRegion;
+                const slot = t.dataset.rosterPts;
+                localStorage.setItem(ROSTER_PTS(region, slot), t.value.trim());
             }
+        }
+        function setActiveRegion(region){
+            const lists = document.querySelectorAll('.mini-roster-list[data-region]');
+            const buttons = document.querySelectorAll('[data-roster-tab]');
+            lists.forEach(list => list.classList.toggle('active', list.dataset.region === region));
+            buttons.forEach(btn => {
+                const isActive = btn.dataset.rosterTab === region;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', String(isActive));
+            });
+            localStorage.setItem(LS_KEY_REGION, region);
         }
         function initMiniRoster(){
             const panel = document.getElementById('miniRoster');
@@ -1014,26 +1048,43 @@
             if(!panel || !toggle) return;
             migrateLegacy();
             loadMiniRoster();
+            const region = localStorage.getItem(LS_KEY_REGION) || 'eu';
+            setActiveRegion(region);
             toggle.addEventListener('click', ()=>{
                 const collapsed = panel.classList.toggle('collapsed');
                 panel.setAttribute('aria-expanded', String(!collapsed));
                 toggle.setAttribute('aria-pressed', String(!collapsed));
             });
+            document.querySelectorAll('[data-roster-tab]').forEach(btn => {
+                btn.addEventListener('click', () => setActiveRegion(btn.dataset.rosterTab));
+            });
             document.addEventListener('input', saveMiniRoster);
         }
         document.addEventListener('DOMContentLoaded', initMiniRoster);
     </script>
-    <!-- Mini Roster (5 players with points) -->
+    <!-- Mini Roster (EU/NA tabs) -->
     <aside id="miniRoster" class="mini-roster collapsed" aria-label="Head to Head roster" aria-expanded="false">
         <div class="mini-roster-header">
             <div class="mini-roster-title">PLAYERS</div>
             <button id="miniRosterToggle" type="button" class="mini-roster-toggle" aria-pressed="false" aria-label="Toggle players panel">⇔</button>
         </div>
-        <div class="mini-roster-list" role="list">
+        <div class="mini-roster-tabs" role="tablist" aria-label="Roster region">
+            <button type="button" class="tab-btn" data-roster-tab="eu" role="tab" aria-selected="false">EU</button>
+            <button type="button" class="tab-btn" data-roster-tab="na" role="tab" aria-selected="false">NA</button>
+        </div>
+        <div class="mini-roster-list" data-region="eu" role="list" aria-label="EU players">
             @for($i=1;$i<=5;$i++)
             <div class="player-row" role="listitem">
-                <input type="text" class="player-name" data-h2h-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="Player {{ $i }} name" />
-                <input type="text" data-h2h-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="Player {{ $i }} points" />
+                <input type="text" class="player-name" data-roster-region="eu" data-roster-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="EU Player {{ $i }} name" />
+                <input type="text" data-roster-region="eu" data-roster-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="EU Player {{ $i }} points" />
+            </div>
+            @endfor
+        </div>
+        <div class="mini-roster-list" data-region="na" role="list" aria-label="NA players">
+            @for($i=1;$i<=5;$i++)
+            <div class="player-row" role="listitem">
+                <input type="text" class="player-name" data-roster-region="na" data-roster-name="{{ $i }}" maxlength="28" placeholder="Player {{ $i }}" aria-label="NA Player {{ $i }} name" />
+                <input type="text" data-roster-region="na" data-roster-pts="{{ $i }}" maxlength="6" class="points" placeholder="0" aria-label="NA Player {{ $i }} points" />
             </div>
             @endfor
         </div>
