@@ -19,10 +19,28 @@ class FinalChaseController extends Controller
         }
     }
 
-    private function pullQuestion(): ?Question
+    private function difficultiesForPhase(?string $phase): array
+    {
+        if ($phase === 'easy') {
+            return [1];
+        }
+        if ($phase === 'medium') {
+            return [2];
+        }
+        if ($phase === 'hard') {
+            return [3];
+        }
+        return [1, 2, 3];
+    }
+
+    private function pullQuestion(array $difficulties = []): ?Question
     {
         $state = session('final_chase');
-        $q = Question::where('used', 0)->inRandomOrder()->first();
+        $query = Question::where('used', 0);
+        if (!empty($difficulties)) {
+            $query->whereIn('difficulty', $difficulties);
+        }
+        $q = $query->inRandomOrder()->first();
         if ($q) {
             // Mark used exactly like round2 logic
             $q->used = 1;
@@ -41,23 +59,29 @@ class FinalChaseController extends Controller
         if ($state['current_question_id']) {
             $question = Question::find($state['current_question_id']);
         } else {
-            $question = $this->pullQuestion();
+            $question = $this->pullQuestion([1]);
         }
+        $remaining = Question::where('used', 0)->count();
         return view('final_chase', [
             'question' => $question,
             'contestant' => $state['contestant_score'],
-            'chaser' => $state['chaser_score']
+            'chaser' => $state['chaser_score'],
+            'remaining' => $remaining,
         ]);
     }
 
     public function next(Request $request)
     {
         $this->initState();
-        $q = $this->pullQuestion();
+        $phase = $request->query('phase');
+        $difficulties = $this->difficultiesForPhase($phase);
+        $q = $this->pullQuestion($difficulties);
+        $remaining = Question::where('used', 0)->count();
         return response()->json([
             'question' => $q?->question,
             'answer' => $q?->answer,
             'id' => $q?->id,
+            'remaining' => $remaining,
         ]);
     }
 

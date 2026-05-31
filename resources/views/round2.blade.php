@@ -169,6 +169,10 @@
             border: 1px solid rgba(255, 255, 255, 0.14);
             box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.04);
             cursor: pointer;
+            min-height: clamp(140px, 18vw, 220px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .question-wrap:hover {
@@ -215,6 +219,7 @@
             font-size: clamp(16px, 4.8vw, 46px);
             line-height: 1.05;
             text-shadow: 0 6px 22px rgba(0, 0, 0, .45), 0 0 22px rgba(0, 230, 255, .25);
+            text-align: center;
         }
 
         .answer-wrap {
@@ -236,6 +241,10 @@
             outline: none;
             overflow: hidden;
             /* ensure shimmer stays within the card */
+            min-height: clamp(120px, 16vw, 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .answer-card:hover {
@@ -305,6 +314,7 @@
             line-height: 1.15;
             color: #ffffff;
             text-shadow: 0 0 22px rgba(255, 0, 243, .35), 0 0 14px rgba(0, 230, 255, .28);
+            text-align: center;
         }
 
         .answer.revealed {
@@ -605,6 +615,7 @@
                                 <polygon points="7 5 19 12 7 19 7 5" />
                             </svg>
                         </button>
+                        <div class="badge" title="Remaining questions">Left: {{ $remaining ?? 0 }}</div>
                     </div>
                 </div>
             </header>

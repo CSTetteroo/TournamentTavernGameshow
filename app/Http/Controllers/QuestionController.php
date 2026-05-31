@@ -38,13 +38,28 @@ class QuestionController extends Controller
     public function round2(Request $request)
     {
         $tiers = Session::get('round2_tiers', 0); // number of correct answers (0-10)
-        $question = Question::where('used', 0)->inRandomOrder()->first();
+            $question = null;
+            $attempts = 0;
+            while ($attempts < 5 && !$question) {
+                $candidate = Question::where('used', 0)
+                    ->whereIn('difficulty', [1, 2])
+                    ->inRandomOrder()
+                    ->first();
+                if (!$candidate) {
+                    break;
+                }
+                $question = $candidate;
+                $attempts++;
+            }
         if ($question) {
             // mark used on fetch (can be reverted if skipped)
             $question->used = 1;
             $question->save();
         }
-        return view('round2', compact('question', 'tiers'));
+        $remaining = Question::where('used', 0)
+            ->whereIn('difficulty', [1, 2])
+            ->count();
+        return view('round2', compact('question', 'tiers', 'remaining'));
     }
 
     // Mark current question as correctly answered: increment tier count up to 10 and show next

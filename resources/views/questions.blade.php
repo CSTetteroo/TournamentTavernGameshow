@@ -17,9 +17,7 @@
         body {
             margin: 0; color: var(--text);
             font-family: Montserrat, system-ui, Segoe UI, Roboto, Ubuntu, Arial, sans-serif;
-            background: radial-gradient(1000px 480px at 110% -10%, rgba(255, 100, 242, .15), transparent 60%),
-                        radial-gradient(900px 420px at -10% 110%, rgba(87, 241, 255, .15), transparent 60%),
-                        linear-gradient(135deg, var(--bg), #0a0f1c);
+            background: var(--bg);
         }
         .wrap{ max-width: 1200px; margin: 0 auto; padding: clamp(16px,3vw,36px); }
         header{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
@@ -37,9 +35,8 @@
         .panel{ background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04)); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
         table{ width:100%; border-collapse: collapse; }
         thead th{ font-weight:800; text-align:left; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); background: var(--panel); border-bottom:1px solid var(--line); padding:14px; }
-        tbody td{ padding:14px; border-bottom:1px solid var(--line); vertical-align:top; }
-        tbody tr:nth-child(odd) td{ background: rgba(255,255,255,0.02); }
-        tbody tr:hover td{ background: rgba(87, 241, 255, 0.06); }
+        tbody tr{ background: rgba(255,255,255,0.02); }
+        tbody td{ padding:14px; border-bottom:1px solid var(--line); vertical-align:top; background: transparent; }
         td .q{ font-weight:800; }
         td[data-col="answer"]{ max-width: 640px; word-wrap: anywhere; }
         .answers-hidden td[data-col="answer"]{ filter: blur(7px); }
@@ -57,6 +54,11 @@
 </head>
 <body>
 <div class="wrap">
+    @php
+        $easyCount = isset($questions) ? $questions->where('difficulty', 1)->count() : 0;
+        $mediumCount = isset($questions) ? $questions->where('difficulty', 2)->count() : 0;
+        $hardCount = isset($questions) ? $questions->where('difficulty', 3)->count() : 0;
+    @endphp
     <header>
         <div class="title">Question Bank</div>
         <div class="actions">
@@ -69,9 +71,12 @@
                 <span>Hide answers</span>
             </label>
             <span class="muted">Total: {{ isset($questions) ? $questions->count() : 0 }}</span>
+            <span class="pill d1">Easy: {{ $easyCount }}</span>
+            <span class="pill d2">Medium: {{ $mediumCount }}</span>
+            <span class="pill d3">Hard: {{ $hardCount }}</span>
             <form method="POST" action="{{ route('questions.reset') }}" onsubmit="return confirm('Reset all questions to unused?');">
                 @csrf
-                <button type="submit" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#001018; font-weight:800; cursor:pointer;">Reset Used</button>
+                <button type="submit" style="padding:8px 12px; border-radius:10px; border:1px solid var(--line); cursor:pointer;">Reset Used</button>
             </form>
         </div>
     </header>

@@ -245,8 +245,7 @@
             background: rgba(255, 255, 255, .06);
         }
 
-        .mini-box select,
-        #timeInput {
+        .mini-box select {
             background: rgba(0, 0, 0, .35);
             color: var(--text);
             border: 1px solid rgba(255, 255, 255, .25);
@@ -259,6 +258,11 @@
             font: 800 24px/1 Orbitron, sans-serif;
             letter-spacing: .08em;
         }
+
+        .phase-badge { font-size: 11px; letter-spacing: .08em; }
+        .phase-badge.easy { background: linear-gradient(90deg, #7cf6a4, #b7ffcf); color: #062010; }
+        .phase-badge.medium { background: linear-gradient(90deg, #ffd166, #ffef9a); color: #2a1a00; }
+        .phase-badge.hard { background: linear-gradient(90deg, #ff7b7b, #ffb3c0); color: #2a0a12; }
 
         .notice {
             font-size: 12px;
@@ -497,16 +501,8 @@
                         </select>
                     </div>
                     <div class="mini-box" aria-label="Timer controls">
-                        <span id="timeDisplay">01:30</span>
-                        <input id="timeInput" placeholder="mm:ss" aria-label="Set time" />
-                        <button class="btn secondary icon-btn" id="setTimeBtn" type="button" aria-label="Set time"
-                            title="Set time">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="9" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                        </button>
+                        <span id="timeDisplay">02:00</span>
+                        <span id="phaseBadge" class="badge phase-badge easy" title="Question difficulty phase">Easy</span>
                         <button class="btn secondary icon-btn" id="startBtn" type="button" aria-label="Start"
                             title="Start">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -528,6 +524,7 @@
                         @csrf
                         <button class="btn danger" type="submit">Full Reset</button>
                     </form>
+                    <span class="badge" id="remainingCount" title="Remaining questions">Left: {{ $remaining ?? 0 }}</span>
                     <span class="notice">Wrong subtracts 1 from the active team.</span>
                 </div>
             </div>
@@ -628,13 +625,12 @@
         const questionText = document.getElementById('questionText');
         const answerCard = document.getElementById('answerCard');
         const answerText = document.getElementById('answerText');
+        const remainingEl = document.getElementById('remainingCount');
+        const phaseBadge = document.getElementById('phaseBadge');
         // Timer
         const timeDisplay = document.getElementById('timeDisplay');
-        const timeInput = document.getElementById('timeInput');
-        const setTimeBtn = document.getElementById('setTimeBtn');
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
-        const resetTimeBtn = document.getElementById('resetTimeBtn');
 
         let maxVisual = 30; // scaling reference for bar width
         function updateBars() {
@@ -681,8 +677,23 @@
         correctBtn.addEventListener('click', () => scoreAndNext(1));
         wrongBtn.addEventListener('click', () => scoreAndNext(-1));
 
+        function phaseForSeconds(seconds) {
+            if (seconds > 90) return 'easy';
+            if (seconds > 60) return 'medium';
+            return 'hard';
+        }
+
+        function updatePhaseBadge() {
+            const phase = phaseForSeconds(countdown);
+            if (!phaseBadge) return;
+            phaseBadge.textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
+            phaseBadge.classList.remove('easy', 'medium', 'hard');
+            phaseBadge.classList.add(phase);
+        }
+
         async function nextQuestion() {
-            const res = await fetch('{{ route('final.chase.next') }}');
+            const phase = phaseForSeconds(countdown);
+            const res = await fetch(`{{ route('final.chase.next') }}?phase=${phase}`);
             const data = await res.json();
             questionText.childNodes.forEach(n => {
                 if (n.nodeType === 3) n.remove();
@@ -693,6 +704,9 @@
             questionWrap.classList.remove('q-revealed');
             answerCard.classList.remove('revealed');
             answerText.classList.remove('revealed');
+            if (remainingEl && typeof data.remaining !== 'undefined') {
+                remainingEl.textContent = `Left: ${data.remaining}`;
+            }
             // next button removed
         }
         // Auto advance only via scoring now.
@@ -728,25 +742,14 @@
         });
 
         // Timer logic (simple, local only) ------------------
-        let countdown = 90; // seconds
+        let countdown = 120; // seconds
         let timerId = null;
 
         function renderTime() {
             const m = Math.floor(countdown / 60).toString().padStart(2, '0');
             const s = Math.floor(countdown % 60).toString().padStart(2, '0');
             timeDisplay.textContent = `${m}:${s}`;
-        }
-
-        function setFromInput() {
-            const v = timeInput.value.trim();
-            if (!v) return;
-            const parts = v.split(':');
-            if (parts.length !== 2) return alert('Use mm:ss');
-            const m = parseInt(parts[0], 10),
-                s = parseInt(parts[1], 10);
-            if (Number.isNaN(m) || Number.isNaN(s) || s < 0 || s >= 60 || m < 0) return alert('Invalid time');
-            countdown = m * 60 + s;
-            renderTime();
+            updatePhaseBadge();
         }
 
         function tick() {
@@ -773,13 +776,11 @@
 
         function resetTimer() {
             stopTimer();
-            countdown = 0;
+            countdown = 120;
             renderTime();
         }
-    setTimeBtn.addEventListener('click', setFromInput);
     startBtn.addEventListener('click', startTimer);
     pauseBtn.addEventListener('click', stopTimer);
-    if(resetTimeBtn){ resetTimeBtn.addEventListener('click', resetTimer); } // guard: element not present
         renderTime();
         /* Mini roster persistence (EU/NA tabs) - shared keys */
         const ROSTER_REGIONS = ['eu', 'na'];
